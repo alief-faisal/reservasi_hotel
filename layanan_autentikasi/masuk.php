@@ -1,0 +1,457 @@
+<?php
+// logic proses masuk ke dalam sistem
+session_start();
+$koneksi = new mysqli("localhost", "root", "", "reservasi_hotel");
+$pesan_error = "";
+$pesan_sukses = "";
+$is_ajax = isset($_POST['mode']); // Deteksi jika request dari AJAX
+$mode = isset($_GET['mode']) ? $_GET['mode'] : 'login'; // Default mode adalah login
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Ambil mode dari POST atau GET, default adalah login
+    $mode = isset($_POST['mode']) ? $_POST['mode'] : (isset($_GET['mode']) ? $_GET['mode'] : 'login');
+    
+    if ($mode === 'daftar') {
+        // LOGIC PENDAFTARAN AKUN BARU
+        $nama = trim($_POST['nama']);
+        $email = trim($_POST['email']);
+        $password = trim($_POST['password']);
+        $konfirmasi_password = trim($_POST['konfirmasi_password']);
+        $peran = 'user'; // Default peran adalah user
+
+        // Validasi input
+        if (empty($nama) || empty($email) || empty($password) || empty($konfirmasi_password)) {
+            $pesan_error = "Semua field harus diisi.";
+            if ($is_ajax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $pesan_error]);
+                exit();
+            }
+        } elseif ($password !== $konfirmasi_password) {
+            $pesan_error = "Password tidak cocok.";
+            if ($is_ajax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $pesan_error]);
+                exit();
+            }
+        } elseif (strlen($password) < 6) {
+            $pesan_error = "Password minimal 6 karakter.";
+            if ($is_ajax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $pesan_error]);
+                exit();
+            }
+        } else {
+            // Cek apakah email sudah terdaftar
+            $stmt_cek = $koneksi->prepare("SELECT * FROM pengguna WHERE email = ?");
+            $stmt_cek->bind_param("s", $email);
+            $stmt_cek->execute();
+            $hasil_cek = $stmt_cek->get_result();
+
+            if ($hasil_cek->num_rows > 0) {
+                $pesan_error = "Email sudah terdaftar. Gunakan email lain.";
+                if ($is_ajax) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => $pesan_error]);
+                    exit();
+                }
+            } else {
+                // Insert akun baru ke database
+                $stmt_insert = $koneksi->prepare("INSERT INTO pengguna (nama, email, password, peran) VALUES (?, ?, ?, ?)");
+                $stmt_insert->bind_param("ssss", $nama, $email, $password, $peran);
+
+                if ($stmt_insert->execute()) {
+                    $pesan_sukses = "Akun berhasil dibuat! Silakan login dengan email dan password Anda.";
+                    
+                    // Jika AJAX request, return JSON
+                    if ($is_ajax) {
+                        header('Content-Type: application/json');
+                        echo json_encode(['success' => true, 'message' => $pesan_sukses]);
+                        exit();
+                    }
+                    
+                    // Reset form
+                    $_POST = [];
+                    // Ubah mode ke login setelah sukses daftar
+                    $mode = 'login';
+                } else {
+                    $pesan_error = "Terjadi kesalahan saat membuat akun. Coba lagi.";
+                    
+                    // Jika AJAX request, return JSON
+                    if ($is_ajax) {
+                        header('Content-Type: application/json');
+                        echo json_encode(['success' => false, 'message' => $pesan_error]);
+                        exit();
+                    }
+                }
+            }
+        }
+    } else {
+        // LOGIC MASUK KE SISTEM
+        // untuk mengambil input dan membuang spasi yang tidak sengaja terketik
+        $email = trim($_POST['email']);
+        $password = trim($_POST['password']);
+
+        // untuk query mencari pengguna berdasarkan email
+        $stmt = $koneksi->prepare("SELECT * FROM pengguna WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $hasil = $stmt->get_result();
+
+        if ($hasil->num_rows > 0) {
+            $user = $hasil->fetch_assoc();
+            
+            // untuk mencocokkan password yang dimasukkan dengan yang ada di database
+            if ($password === $user['password']) {
+                $_SESSION['id_pengguna'] = $user['id_pengguna'];
+                $_SESSION['nama'] = $user['nama'];
+                $_SESSION['peran'] = $user['peran'];
+                
+                // Jika AJAX request, return JSON
+                if ($is_ajax) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => true, 'message' => 'Login berhasil']);
+                    exit();
+                }
+                
+                header("Location: /reservasi_hotel/index.php");
+                exit();
+            } else {
+                $pesan_error = "Kredensial tidak cocok.";
+                
+                // Jika AJAX request, return JSON
+                if ($is_ajax) {
+                    header('Content-Type: application/json');
+                    echo json_encode(['success' => false, 'message' => $pesan_error]);
+                    exit();
+                }
+            }
+        } else {
+            $pesan_error = "Kredensial tidak cocok.";
+            
+            // Jika AJAX request, return JSON
+            if ($is_ajax) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => $pesan_error]);
+                exit();
+            }
+        }
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk Akun</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+        background-color: #f8fafc;
+    }
+
+    .wrapper {
+        max-width: 360px;
+        margin: 100px auto;
+        padding: 32px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+    }
+
+    .form-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 24px;
+        color: #0f172a;
+    }
+
+    .alert {
+        color: #e53e3e;
+        font-size: 0.85rem;
+        margin-bottom: 16px;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: #475569;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: border-color 0.15s;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #0f172a;
+    }
+
+    .password-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .password-wrapper input {
+        width: 100%;
+        padding-right: 40px;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        transition: color 0.2s;
+    }
+
+    .toggle-password:hover {
+        color: #0f172a;
+    }
+
+    .toggle-password svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 10px;
+        background: #0E56FF;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .btn-submit:hover {
+        background: #0d4ed5;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 24px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .tab-button {
+        padding: 12px 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #94a3b8;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+        margin-bottom: -2px;
+    }
+
+    .tab-button.active {
+        color: #0E56FF;
+        border-bottom-color: #0E56FF;
+    }
+
+    .tab-button:hover {
+        color: #0f172a;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .alert-success {
+        color: #22863a;
+        background: #f0f5e9;
+        border: 1px solid #d4e9cf;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        margin-bottom: 16px;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .toggle-text {
+        text-align: center;
+        margin-top: 12px;
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    .toggle-text a {
+        color: #0E56FF;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .toggle-text a:hover {
+        text-decoration: underline;
+    }
+    </style>
+</head>
+
+<body>
+    <?php include_once '../komponen/navigasi.php'; ?>
+
+    <main>
+        <section class="wrapper">
+            <h2 class="form-title"><?php echo $mode === 'daftar' ? 'Daftar Akun' : 'Login dulu cuy!'; ?></h2>
+
+            <?php if($pesan_sukses): ?>
+            <div class="alert-success"><?= $pesan_sukses; ?></div>
+            <?php endif; ?>
+
+            <?php if($pesan_error): ?>
+            <div class="alert"><?= $pesan_error; ?></div>
+            <?php endif; ?>
+
+            <!-- TAB LOGIN -->
+            <div class="tab-content <?php echo $mode === 'login' ? 'active' : ''; ?>" id="tab-login">
+                <form action="?mode=login" method="POST">
+                    <div class="form-group">
+                        <label for="email-login">Email</label>
+                        <input type="email" id="email-login" name="email" required placeholder="Masukkan email">
+                    </div>
+                    <div class="form-group">
+                        <label for="password-login">Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="password-login" name="password" required
+                                placeholder="Masukkan password">
+                            <button type="button" class="toggle-password" onclick="togglePassword('password-login')">
+                                <svg id="eye-icon-login" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                    </path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">Masuk</button>
+                </form>
+                <div class="toggle-text">
+                    Belum punya akun? <a onclick="switchTab('daftar')">Daftar di sini</a>
+                </div>
+            </div>
+
+            <!-- TAB DAFTAR -->
+            <div class="tab-content <?php echo $mode === 'daftar' ? 'active' : ''; ?>" id="tab-daftar">
+                <form action="?mode=daftar" method="POST">
+                    <div class="form-group">
+                        <label for="nama">Nama Lengkap</label>
+                        <input type="text" id="nama" name="nama" required placeholder="Masukkan nama lengkap"
+                            value="<?= isset($_POST['nama']) ? htmlspecialchars($_POST['nama']) : ''; ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="email-daftar">Email</label>
+                        <input type="email" id="email-daftar" name="email" required placeholder="Masukkan email"
+                            value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="password-daftar">Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="password-daftar" name="password" required
+                                placeholder="Minimal 6 karakter">
+                            <button type="button" class="toggle-password" onclick="togglePassword('password-daftar')">
+                                <svg id="eye-icon-daftar" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                    </path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="konfirmasi-password">Konfirmasi Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="konfirmasi-password" name="konfirmasi_password" required
+                                placeholder="Ulangi password">
+                            <button type="button" class="toggle-password"
+                                onclick="togglePassword('konfirmasi-password')">
+                                <svg id="eye-icon-konfirmasi" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                    </path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">Daftar</button>
+                </form>
+                <div class="toggle-text">
+                    Sudah punya akun? <a onclick="switchTab('login')">Login di sini</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+    }
+
+    function switchTab(tab) {
+        // Sembunyikan semua tab
+        document.getElementById('tab-login').classList.remove('active');
+        document.getElementById('tab-daftar').classList.remove('active');
+
+        // Tampilkan tab yang dipilih
+        if (tab === 'login') {
+            document.getElementById('tab-login').classList.add('active');
+            window.history.replaceState({}, document.title, '?mode=login');
+        } else if (tab === 'daftar') {
+            document.getElementById('tab-daftar').classList.add('active');
+            window.history.replaceState({}, document.title, '?mode=daftar');
+        }
+    }
+    </script>
+</body>
+
+</html>
