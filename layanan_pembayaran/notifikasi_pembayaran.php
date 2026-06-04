@@ -75,10 +75,8 @@ class NotifikasiPembayaran {
         </html>
         ";
         
-        // Simulasi pengiriman email (dalam aplikasi real, gunakan mail() atau PHPMailer)
-        // mail($data_pembayaran['email'], $subject, $body, $headers);
         
-        // Catat notifikasi dikirim
+        // notifikasi dikirim
         self::catatNotifikasi('pembayaran_sukses', $data_pembayaran['id_pembayaran'], $data_pembayaran['email']);
         
         return true;
@@ -118,8 +116,6 @@ class NotifikasiPembayaran {
     }
     
     private static function catatNotifikasi($tipe, $id_pembayaran, $email) {
-        // Catat notifikasi yang dikirim ke database (optional)
-        // untuk keperluan audit trail dan re-sending
         return true;
     }
 }

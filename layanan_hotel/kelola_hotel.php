@@ -28,11 +28,20 @@ if (isset($_GET['aksi']) && $_GET['aksi'] === 'hapus' && isset($_GET['id_hotel']
     exit();
 }
 
+// Ambil data fasilitas dari database
+$query_fasilitas = "SELECT * FROM fasilitas ORDER BY id_fasilitas ASC";
+$hasil_fasilitas = $koneksi->query($query_fasilitas);
+$fasilitas_list = [];
+while ($fac = $hasil_fasilitas->fetch_assoc()) {
+    $fasilitas_list[] = $fac;
+}
+
 // Tambah Data Baru
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['tambah_hotel'])) {
     $nama = $_POST['nama_hotel'];
     $deskripsi = $_POST['deskripsi'];
     $lokasi = $_POST['lokasi'];
+    $rating = intval($_POST['rating']);
     $nama_file_final = "default.jpg";
 
     if (isset($_FILES['foto_hotel']) && $_FILES['foto_hotel']['error'] === 0) {
@@ -47,8 +56,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['tambah_hotel'])) {
     }
 
     /* Simpan data hotel */
-    $stmt = $koneksi->prepare("INSERT INTO hotel (nama_hotel, deskripsi, lokasi, foto) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $nama, $deskripsi, $lokasi, $nama_file_final);
+    $stmt = $koneksi->prepare("INSERT INTO hotel (nama_hotel, deskripsi, lokasi, foto, rating) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssi", $nama, $deskripsi, $lokasi, $nama_file_final, $rating);
     
     if($stmt->execute()) {
         $id_hotel_baru = $koneksi->insert_id;
@@ -63,6 +72,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['tambah_hotel'])) {
         $stmt_kamar1 = $koneksi->prepare("INSERT INTO kamar (id_hotel, nama_kamar, tipe_kamar, harga_per_malam, stok_kamar, diskon_persen) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt_kamar1->bind_param("issdii", $id_hotel_baru, $nama_k1, $tipe_k1, $harga_k1, $stok_k1, $diskon_k1);
         $stmt_kamar1->execute();
+        $id_kamar1 = $stmt_kamar1->insert_id;
+
+        // Simpan fasilitas kamar 1
+        if (isset($_POST['fasilitas_kamar_1']) && is_array($_POST['fasilitas_kamar_1'])) {
+            foreach (array_slice($_POST['fasilitas_kamar_1'], 0, 7) as $id_fasilitas) {
+                $id_fac = intval($id_fasilitas);
+                $stmt_fac = $koneksi->prepare("INSERT INTO kamar_fasilitas (id_kamar, id_fasilitas) VALUES (?, ?)");
+                $stmt_fac->bind_param("ii", $id_kamar1, $id_fac);
+                $stmt_fac->execute();
+            }
+        }
 
         /* logic data tipe kamar ke-2 */
         $tipe_k2 = $_POST['tipe_kamar_2'];
@@ -74,6 +94,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['tambah_hotel'])) {
         $stmt_kamar2 = $koneksi->prepare("INSERT INTO kamar (id_hotel, nama_kamar, tipe_kamar, harga_per_malam, stok_kamar, diskon_persen) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt_kamar2->bind_param("issdii", $id_hotel_baru, $nama_k2, $tipe_k2, $harga_k2, $stok_k2, $diskon_k2);
         $stmt_kamar2->execute();
+        $id_kamar2 = $stmt_kamar2->insert_id;
+
+        // Simpan fasilitas kamar 2
+        if (isset($_POST['fasilitas_kamar_2']) && is_array($_POST['fasilitas_kamar_2'])) {
+            foreach (array_slice($_POST['fasilitas_kamar_2'], 0, 7) as $id_fasilitas) {
+                $id_fac = intval($id_fasilitas);
+                $stmt_fac = $koneksi->prepare("INSERT INTO kamar_fasilitas (id_kamar, id_fasilitas) VALUES (?, ?)");
+                $stmt_fac->bind_param("ii", $id_kamar2, $id_fac);
+                $stmt_fac->execute();
+            }
+        }
 
         echo "<script>alert('Hotel dan pilihan kamar berhasil disimpan.'); window.location='kelola_hotel.php';</script>";
     }
@@ -364,7 +395,7 @@ $pesanan_counts = json_encode(array_map(function($item) { return $item['jumlah_p
 
     <main class="panel-container">
         <header class="panel-header">
-            <h1 class="panel-title">Dashboard Manajemen Hotel</h1>
+            <h1 class="panel-title">Dashboard Manajemenn Hotel</h1>
             <form id="adminSearchForm" class="header-search" action="" method="GET">
                 <input type="text" name="cari_admin" id="adminSearchInput"
                     value="<?= htmlspecialchars($pencarian_admin); ?>" placeholder="Cari hotel...">
@@ -406,6 +437,17 @@ $pesanan_counts = json_encode(array_map(function($item) { return $item['jumlah_p
                         <label>Foto Hotel</label>
                         <input type="file" name="foto_hotel" accept="image/*" required>
                     </div>
+                    <div class="form-group">
+                        <label>Hotel Bintang</label>
+                        <select name="rating" required>
+                            <option value="" disabled selected>-- Pilih Bintang Hotel --</option>
+                            <option value="1">1 Bintang</option>
+                            <option value="2">2 Bintang</option>
+                            <option value="3">3 Bintang</option>
+                            <option value="4">4 Bintang</option>
+                            <option value="5">5 Bintang</option>
+                        </select>
+                    </div>
 
                     <div class="sub-section-title">Tipe Kamar 1</div>
                     <div class="form-group">
@@ -425,6 +467,22 @@ $pesanan_counts = json_encode(array_map(function($item) { return $item['jumlah_p
                     <div class="form-group">
                         <label>Diskon (%)</label>
                         <input type="number" name="diskon_kamar_1" placeholder="0" min="0" max="100" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Fasilitas</label>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 4px;">
+                            <?php foreach ($fasilitas_list as $fac): ?>
+                            <label
+                                style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; font-weight: 400;">
+                                <input type="checkbox" name="fasilitas_kamar_1[]" value="<?= $fac['id_fasilitas']; ?>"
+                                    style="cursor: pointer;">
+                                <span><?= htmlspecialchars($fac['nama_fasilitas']); ?></span>
+                            </label>
+                            <?php endforeach; ?>
+                        </div>
+                        <small style="color: #94a3b8; font-size: 0.75rem; margin-top: 4px; display: block;">Pilih
+                            maksimal 7 fasilitas</small>
                     </div>
 
                     <div class="sub-section-title">Tipe Kamar 2</div>
@@ -446,13 +504,28 @@ $pesanan_counts = json_encode(array_map(function($item) { return $item['jumlah_p
                         <label>Diskon (%)</label>
                         <input type="number" name="diskon_kamar_2" placeholder="0" min="0" max="100" value="0">
                     </div>
+                    <div class="form-group">
+                        <label>Fasilitas </label>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 4px;">
+                            <?php foreach ($fasilitas_list as $fac): ?>
+                            <label
+                                style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; font-weight: 400;">
+                                <input type="checkbox" name="fasilitas_kamar_2[]" value="<?= $fac['id_fasilitas']; ?>"
+                                    style="cursor: pointer;">
+                                <span><?= htmlspecialchars($fac['nama_fasilitas']); ?></span>
+                            </label>
+                            <?php endforeach; ?>
+                        </div>
+                        <small style="color: #94a3b8; font-size: 0.75rem; margin-top: 4px; display: block;">Pilih
+                            maksimal 7 fasilitas</small>
+                    </div>
 
                     <button type="submit" name="tambah_hotel" class="btn-submit">Simpan Hotel</button>
                 </form>
             </section>
 
             <div class="right-content-wrapper">
-
                 <section class="table-responsive">
                     <table>
                         <thead>
@@ -475,7 +548,8 @@ $pesanan_counts = json_encode(array_map(function($item) { return $item['jumlah_p
                                     ?>
                                     <img src="<?= $path; ?>" class="img-thumb" alt="">
                                 </td>
-                                <td style="font-weight:500; color:#0f172a;"><?= htmlspecialchars($row['nama_hotel']); ?>
+                                <td style="font-weight:500; color:#0f172a;">
+                                    <?= htmlspecialchars($row['nama_hotel']); ?>
                                 </td>
                                 <td><?= htmlspecialchars($row['lokasi']); ?></td>
                                 <td>Rp
@@ -490,7 +564,8 @@ $pesanan_counts = json_encode(array_map(function($item) { return $item['jumlah_p
                             <?php endwhile; ?>
                             <?php else: ?>
                             <tr>
-                                <td colspan="5" style="text-align:center; color:#64748b; padding: 40px 0;">Data hotel
+                                <td colspan="5" style="text-align:center; color:#64748b; padding: 40px 0;">Data
+                                    hotel
                                     tidak ditemukan atau belum tersedia.</td>
                             </tr>
                             <?php endif; ?>
@@ -510,6 +585,7 @@ $pesanan_counts = json_encode(array_map(function($item) { return $item['jumlah_p
                 <div class="no-data-msg">Belum ada pesanan hari ini.</div>
                 <?php endif; ?>
             </section>
+        </div>
         </div>
     </main>
 

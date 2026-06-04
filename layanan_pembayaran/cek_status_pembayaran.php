@@ -1,5 +1,5 @@
 <?php
-// API endpoint untuk polling status pembayaran (untuk real-time update)
+// API endpoint untuk polling status pembayaran untuk real-time update
 session_start();
 header('Content-Type: application/json');
 

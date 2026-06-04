@@ -392,6 +392,45 @@ if (isset($_POST['proses_pesan'])) {
         border-radius: 3px;
     }
 
+    .fasilitas-section {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 2px solid #e2e8f0;
+    }
+
+    .fasilitas-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .fasilitas-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .fasilitas-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: #475569;
+        padding: 8px;
+        background: #f8fafc;
+        border-radius: 6px;
+        border-left: 3px solid #dc2626;
+    }
+
+    .fasilitas-icon {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
     @media (max-width: 1200px) {
         .rekomendasi-grid {
             grid-template-columns: repeat(3, 1fr);
@@ -465,13 +504,17 @@ if (isset($_POST['proses_pesan'])) {
                 <?php if ($hasil_kamar->num_rows > 0): ?>
                 <div class="booking-box">
                     <label class="form-label">Pilih Tipe Kamar & Tarif</label>
-                    <select name="id_kamar" class="form-select" required>
-                        <?php while($kamar = $hasil_kamar->fetch_assoc()): 
+                    <select name="id_kamar" class="form-select" id="pilihKamar" required>
+                        <option value="">-- Pilih Kamar --</option>
+                        <?php
+                        // Reset result pointer
+                        $hasil_kamar->data_seek(0);
+                        while($kamar = $hasil_kamar->fetch_assoc()):
                             $harga_kamar = $kamar['harga_per_malam'];
                             $diskon_kamar = intval($kamar['diskon_persen'] ?? 0);
                             $harga_akhir = $diskon_kamar > 0 ? $harga_kamar * (100 - $diskon_kamar) / 100 : $harga_kamar;
                         ?>
-                        <option value="<?= $kamar['id_kamar']; ?>">
+                        <option value="<?= $kamar['id_kamar']; ?>" data-id-kamar="<?= $kamar['id_kamar']; ?>">
                             <?= htmlspecialchars($kamar['nama_kamar']); ?>
                             (<?= htmlspecialchars($kamar['tipe_kamar']); ?>)
                             <?php if ($diskon_kamar > 0): ?>
@@ -483,6 +526,12 @@ if (isset($_POST['proses_pesan'])) {
                         </option>
                         <?php endwhile; ?>
                     </select>
+                </div>
+
+                <!-- Fasilitas Section -->
+                <div class="fasilitas-section" id="fasilitasContainer" style="display: none;">
+                    <div class="fasilitas-title">Fasilitas Kamar</div>
+                    <div class="fasilitas-list" id="daftarFasilitas"></div>
                 </div>
 
                 <button type="submit" name="proses_pesan" class="btn-booking">Pesan Hotel</button>
@@ -558,6 +607,44 @@ if (isset($_POST['proses_pesan'])) {
             ?>
         </div>
     </section>
+
+    <script>
+    // Load fasilitas ketika kamar dipilih
+    const pilihKamarSelect = document.getElementById('pilihKamar');
+    const fasilitasContainer = document.getElementById('fasilitasContainer');
+    const daftarFasilitas = document.getElementById('daftarFasilitas');
+
+    pilihKamarSelect.addEventListener('change', async function() {
+        const idKamar = this.value;
+
+        if (idKamar === '') {
+            fasilitasContainer.style.display = 'none';
+            daftarFasilitas.innerHTML = '';
+            return;
+        }
+
+        try {
+            const response = await fetch(`get_fasilitas.php?id_kamar=${idKamar}`);
+            const fasilitas = await response.json();
+
+            if (fasilitas.length > 0) {
+                daftarFasilitas.innerHTML = fasilitas.map(item =>
+                    `<div class="fasilitas-item">
+                        <span style="font-weight: 600;">✓</span>
+                        <span>${item.nama_fasilitas}</span>
+                    </div>`
+                ).join('');
+                fasilitasContainer.style.display = 'block';
+            } else {
+                fasilitasContainer.style.display = 'none';
+                daftarFasilitas.innerHTML = '';
+            }
+        } catch (error) {
+            console.error('Error loading fasilitas:', error);
+            fasilitasContainer.style.display = 'none';
+        }
+    });
+    </script>
 
 </body>
 

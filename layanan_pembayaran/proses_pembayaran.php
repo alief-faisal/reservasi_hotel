@@ -1,5 +1,5 @@
 <?php
-// API backend untuk proses pembayaran (lebih realistis dengan validasi detail)
+// API backend untuk proses pembayaran
 session_start();
 header('Content-Type: application/json');
 
@@ -49,7 +49,7 @@ if ($data['id_pengguna'] != $_SESSION['id_pengguna']) {
     exit();
 }
 
-// Jika sudah lunas
+// Sudah lunas
 if ($data['status_pembayaran'] === 'lunas') {
     http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Pembayaran sudah dikonfirmasi sebelumnya']);
@@ -62,17 +62,17 @@ switch ($metode_bayar) {
     case 'gopay':
     case 'ovo':
     case 'dana':
-        $delay_time = 3; // 3 detik
+        $delay_time = 3; 
         break;
     case 'kartu_kredit':
-        $delay_time = 2; // 2 detik
+        $delay_time = 2; 
         break;
     case 'transfer_bank':
-        $delay_time = 5; // 5 detik
+        $delay_time = 5; 
         break;
 }
 
-// Simulasi proses pembayaran dengan random chance gagal (1% chance)
+// Simulasi proses pembayaran dengan peluang gagal
 sleep($delay_time);
 
 $random_fail = rand(1, 100);

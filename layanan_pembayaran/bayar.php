@@ -346,7 +346,7 @@ $payment_methods = [
     <?php include_once '../komponen/navigasi.php'; ?>
 
     <div class="payment-container">
-        <!-- Bagian Invoice/Ringkasan -->
+        <!-- Logic Invoice/Ringkasan -->
         <div class="invoice-section">
             <div class="invoice-header">
                 <h2 class="invoice-title">Invoice Pembayaran</h2>
@@ -404,7 +404,7 @@ $payment_methods = [
             </div>
         </div>
 
-        <!-- Bagian Metode Pembayaran -->
+        <!-- Logici Metode Pembayaran -->
         <div class="payment-section">
             <h3 class="payment-title">
                 Pilih Metode Pembayaran
@@ -463,7 +463,7 @@ $payment_methods = [
             return;
         }
 
-        // Disable button dan tampilkan loading
+        // Disable button 
         payBtn.disabled = true;
         const originalText = payBtn.textContent;
         payBtn.innerHTML = '⏳ Memproses pembayaran...';
@@ -482,7 +482,7 @@ $payment_methods = [
             const data = await response.json();
 
             if (data.status === 'success') {
-                // Sukses - redirect dengan delay untuk efek dramatic
+                // Sukses 
                 payBtn.innerHTML = '✓ Pembayaran Berhasil!';
                 payBtn.style.background = '#10b981';
 
