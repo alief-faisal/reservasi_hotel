@@ -51,7 +51,7 @@ if (!$data_hotel) {
     exit();
 }
 
-// Proses Eksekusi Update Data
+// Proses Update Data
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nama = $_POST['nama_hotel'];
     $deskripsi = $_POST['deskripsi'];
@@ -87,8 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt_km->bind_param("dii", $harga_baru, $diskon_baru, $kamar['id_kamar']);
             $stmt_km->execute();
 
-            // Update fasilitas kamar
-            // Hapus fasilitas lama
+            // Update fasilitas kamar dan hapus fasilitas lama
             $stmt_del_fac = $koneksi->prepare("DELETE FROM kamar_fasilitas WHERE id_kamar = ?");
             $stmt_del_fac->bind_param("i", $kamar['id_kamar']);
             $stmt_del_fac->execute();
@@ -219,7 +218,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </select>
             </div>
             <div class="form-ctrl">
-                <label>Ganti Foto (Biarkan kosong jika tidak ingin diubah)</label>
+                <label>Ganti Foto</label>
                 <input type="file" name="foto_hotel" accept="image/*">
             </div>
             <div class="form-ctrl">

@@ -1,5 +1,5 @@
 <?php
-// Database Migration - Tambahkan Tabel Fasilitas
+// Tambahkan Tabel Fasilitas
 $koneksi = new mysqli("localhost", "root", "", "reservasi_hotel");
 
 if ($koneksi->connect_error) {
@@ -14,7 +14,7 @@ $migrations = [
         icon_class VARCHAR(50) DEFAULT NULL
     )",
     
-    // Buat tabel kamar_fasilitas (junction table)
+    // Buat tabel kamar_fasilitas
     "CREATE TABLE IF NOT EXISTS kamar_fasilitas (
         id_kamar_fasilitas INT PRIMARY KEY AUTO_INCREMENT,
         id_kamar INT NOT NULL,
@@ -24,7 +24,7 @@ $migrations = [
         UNIQUE KEY unique_kamar_fasilitas (id_kamar, id_fasilitas)
     )",
     
-    // Insert fasilitas default
+    // Insert fasilitas 
     "INSERT IGNORE INTO fasilitas (id_fasilitas, nama_fasilitas, icon_class) VALUES 
         (1, 'Kasur Premium', 'bed'),
         (2, 'Bathub', 'bath'),

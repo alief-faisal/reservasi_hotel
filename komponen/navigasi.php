@@ -2,13 +2,13 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-/* searchbar */
+/* logika searchbar */
 $pencarian = isset($_GET['cari']) ? htmlspecialchars($_GET['cari']) : '';
 
-// Deteksi nama file halaman yang sedang diakses saat ini
+// logika deteksi nama file halaman yang sedang diakses saat ini
 $halaman_sekarang = basename($_SERVER['SCRIPT_NAME']);
 
-// Ambil daftar nama hotel untuk animasi placeholder
+// logika ambil daftar nama hotel untuk animasi placeholder
 $koneksi = new mysqli("localhost", "root", "", "reservasi_hotel");
 $queryHotel = "SELECT nama_hotel FROM hotel LIMIT 8";
 $hasilHotel = $koneksi->query($queryHotel);
@@ -56,7 +56,7 @@ $hotelJSON = json_encode($daftarHotel);
     pointer-events: none !important;
 }
 
-/* Animasi placeholder slide up - hanya bagian nama hotel */
+/* logika animasi placeholder slide up */
 @keyframes slideUpHotelName {
     0% {
         opacity: 1;
@@ -120,8 +120,9 @@ $hotelJSON = json_encode($daftarHotel);
         style="max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;">
 
         <div class="nav-wrapper" style="display: flex; align-items: center; gap: 32px; flex-grow: 1;">
-            <a href="/reservasi_hotel/index.php" class="brand-logo"
-                style="font-size: 1.1rem; font-weight: 700; color: #0f172a; text-decoration: none; letter-spacing: -0.5px;">Kelompok1
+            <a href="/reservasi_hotel/index.php" class="brand-logo" style="display: flex; align-items: center;">
+                <img src="assets/logo/logo.png" alt="Logo Kelompok 1"
+                    style="height: 40px; width: auto; object-fit: contain;">
             </a>
 
             <?php if ($halaman_sekarang !== 'kelola_hotel.php'): ?>
@@ -187,17 +188,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let isTyping = false;
     let placeholderInterval;
 
-    // Fungsi untuk mengubah placeholder dengan animasi slide up
+    // logika fungsi untuk mengubah placeholder dengan animasi slide up
     const updatePlaceholder = () => {
         if (!isTyping && searchInput.value === '') {
             const hotel = hotelList[currentIndex % hotelList.length];
 
-            // Trigger animasi
+            // logika trigger animasi
             searchInput.classList.remove('animate-placeholder');
-            void searchInput.offsetWidth; // Trigger reflow untuk reset animasi
+            void searchInput.offsetWidth; // logika trigger reflow untuk reset animasi
             searchInput.classList.add('animate-placeholder');
 
-            // Update placeholder text setelah animasi halfway (300ms)
+            // logika update placeholder text setelah animasi slide up selesai
             setTimeout(() => {
                 searchInput.placeholder = `${hotel}...`;
             }, 300);
@@ -206,11 +207,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Update placeholder setiap 3 detik
+    // logika update placeholder setiap 3 detik
     updatePlaceholder();
     placeholderInterval = setInterval(updatePlaceholder, 3000);
 
-    // Deteksi ketika user mulai mengetik
+    // logika deteksi ketika user mulai mengetik
     searchInput.addEventListener('input', () => {
         isTyping = searchInput.value !== '';
         if (isTyping) {
@@ -221,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Reset placeholder ketika input fokus
+    // logika reset placeholder ketika input fokus
     searchInput.addEventListener('focus', () => {
         if (searchInput.value === '') {
             searchInput.placeholder = 'Cari Hotel...';
@@ -229,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Resume placeholder animation ketika input blur dan kosong
+    // logika resume placeholder animation ketika input blur dan kosong
     searchInput.addEventListener('blur', () => {
         if (searchInput.value === '') {
             clearInterval(placeholderInterval);

@@ -54,13 +54,13 @@ if (isset($_POST['proses_pesan'])) {
     $diskon = intval($data_kamar_pilihan['diskon_persen'] ?? 0);
     $total_bayar = $diskon > 0 ? $harga_asli * (100 - $diskon) / 100 : $harga_asli;
 
-    /* Buat data transaksi pemesanan */
+    /* data transaksi pemesanan */
     $stmt_pesan = $koneksi->prepare("INSERT INTO pemesanan (id_pengguna, id_kamar, tanggal_checkin, tanggal_checkout, total_bayar) VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY), ?)");
     $stmt_pesan->bind_param("iid", $id_pengguna, $id_kamar_pilihan, $total_bayar);
     $stmt_pesan->execute();
     $id_pemesanan_baru = $stmt_pesan->insert_id;
 
-    /* Buat status pembayaran tagihan */
+    /* status pembayaran tagihan */
     $stmt_bayar = $koneksi->prepare("INSERT INTO pembayaran (id_pemesanan, metode_pembayaran, status_pembayaran) VALUES (?, 'E-Wallet QRIS', 'belum_lunas');");
     $stmt_bayar->bind_param("i", $id_pemesanan_baru);
     $stmt_bayar->execute();
@@ -505,7 +505,7 @@ if (isset($_POST['proses_pesan'])) {
                 <div class="booking-box">
                     <label class="form-label">Pilih Tipe Kamar & Tarif</label>
                     <select name="id_kamar" class="form-select" id="pilihKamar" required>
-                        <option value="">-- Pilih Kamar --</option>
+                        <option value="">Pilih Kamar</option>
                         <?php
                         // Reset result pointer
                         $hasil_kamar->data_seek(0);
@@ -543,7 +543,7 @@ if (isset($_POST['proses_pesan'])) {
         </section>
     </main>
 
-    <!-- Section Rekomendasi Hotel Lain di Wilayah Sama -->
+    <!-- Rekomendasi Hotel Lain di Wilayah Sama -->
     <section class="rekomendasi-section">
         <h2 class="rekomendasi-title">Hotel Lain di <?= htmlspecialchars($data_hotel['lokasi']); ?></h2>
 

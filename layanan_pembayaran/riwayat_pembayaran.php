@@ -349,7 +349,7 @@ $hasil = $stmt->get_result();
             <div class="empty-icon">📭</div>
             <div class="empty-text">Belum Ada Riwayat Pembayaran</div>
             <div class="empty-subtext">Mulai pesan kamar hotel sekarang untuk melacak pembayaran Anda di sini</div>
-            <a href="../index.php" class="btn-home">🏨 Cari Hotel Sekarang</a>
+            <a href="../index.php" class="btn-home">Cari Hotel Sekarang</a>
         </div>
         <?php endif; ?>
     </div>
