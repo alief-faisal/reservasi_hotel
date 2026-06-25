@@ -134,7 +134,7 @@ if ($hasil_favorit && $hasil_favorit->num_rows > 0) {
                                     <div class="price-row">
                                         <span>IDR
                                             <?= $harga_final ? number_format($harga_final, 0, ',', '.') : '-'; ?><span
-                                                class="price-suffix">/malam</span></span>
+                                                class="price-suffix">/Malam</span></span>
                                     </div>
                                 </span>
                             </div>
@@ -209,7 +209,7 @@ if ($hasil_favorit && $hasil_favorit->num_rows > 0) {
                                     <div class="price-row">
                                         <span>IDR
                                             <?= $harga_final ? number_format($harga_final, 0, ',', '.') : '-'; ?><span
-                                                class="price-suffix">/malam</span></span>
+                                                class="price-suffix">/Malam</span></span>
                                     </div>
                                 </span>
                             </div>

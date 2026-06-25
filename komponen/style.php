@@ -538,9 +538,9 @@ body {
 }
 
 .price-suffix {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     font-weight: 400;
-    color: #7f1d1d;
+    color: #686868;
     margin-left: 2px;
 }
 

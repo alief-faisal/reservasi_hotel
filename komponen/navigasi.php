@@ -157,15 +157,14 @@ $hotelJSON = json_encode($daftarHotel);
 
             <span style="color: #cbd5e1;">|</span>
             <a href="/reservasi_hotel/layanan_autentikasi/keluar.php"
-                style="color: #ef4444; text-decoration: none; font-weight: 500;">Keluar</a>
+                style="background: #E60000; border: none; color: #ffffff; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.9rem; padding: 6px 16px; border-radius: 6px;">Keluar</a>
             <?php else: ?>
             <button type="button" onclick="openLoginModal('login')"
                 style="background: none; border: none; color: #2563eb; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
                 Masuk
             </button>
-            <span style="color: #cbd5e1;">/</span>
             <button type="button" onclick="openLoginModal('daftar')"
-                style="background: none; border: none; color: #2563eb; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+                style="background: #2563eb; border: none; color: #ffffff; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.9rem; padding: 6px 16px; border-radius: 6px;">
                 Daftar
             </button>
             <?php endif; ?>
