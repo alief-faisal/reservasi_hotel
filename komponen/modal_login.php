@@ -37,7 +37,7 @@
             </div>
         </div>
 
-        <!-- TAB DAFTAR -->
+        <!-- form daftar -->
         <div class="tab-content" id="tab-daftar">
             <form id="registerForm" method="POST">
                 <div class="form-group">

@@ -396,7 +396,39 @@ body {
     text-decoration: underline;
 }
 
-/* card hotel */
+/* ==========================================================================
+    LAYOUT GRID UTAMA (Kunci 4 Kolom Ke Samping)
+    ========================================================================== */
+.grid-4-kolom {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 20px !important;
+    width: 100% !important;
+    margin-bottom: 30px;
+}
+
+.container-diskon-tengah {
+    width: 100% !important;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+/* Responsive Layout */
+@media (max-width: 992px) {
+    .grid-4-kolom {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .grid-4-kolom {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ==========================================================================
+    CARD HOTEL
+    ========================================================================== */
 .card-link {
     text-decoration: none;
     color: inherit;
@@ -476,12 +508,6 @@ body {
     filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
 }
 
-.icon-location {
-    width: 14px;
-    height: 14px;
-    fill: #64748b;
-}
-
 .card-title {
     font-size: 1.1rem;
     font-weight: 600;
@@ -495,31 +521,11 @@ body {
     min-height: 3.0rem;
 }
 
-.card-text {
-    color: #475569;
-    font-size: 0.88rem;
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 24px;
-}
-
 .price-wrapper {
     margin-top: auto;
     display: flex;
     flex-direction: column;
     padding-top: 8px;
-}
-
-.price-label {
-    font-size: 0.75rem;
-    color: #64748b;
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
 }
 
 .price-amount {
@@ -581,7 +587,7 @@ body {
     white-space: nowrap;
 }
 
-/* Skeleton */
+/*  SKELETON SHIMMER */
 @keyframes efekShimmer {
     0% {
         background-position: -200% 0;
@@ -615,10 +621,10 @@ body {
     grid-column: span 4;
 }
 
-/* Diskon */
+/* SECTION DISKON BACKGROUND  */
 .section-diskon-besar {
-    margin-bottom: 60px;
-    margin-top: 80px;
+    margin-bottom: 40px;
+    margin-top: 40px;
     background: linear-gradient(135deg, #002A61 0%, #152BF5 100%);
     padding: 40px;
     border-radius: 12px;
@@ -638,6 +644,446 @@ body {
     gap: 20px;
     width: 100%;
 }
+
+@media (max-width: 992px) {
+    .grid-diskon {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .grid-diskon {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* utama */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+}
+
+body {
+    background-color: #f8fafc;
+    color: #1e293b;
+}
+
+/* layout */
+.container {
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 40px;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+}
+
+.flex-hotel {
+    position: relative;
+    width: 100%;
+}
+
+#skeleton-container,
+#actual-content {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    width: 100%;
+    align-items: stretch;
+}
+
+#actual-content {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* banner slider */
+.banner-section {
+    max-width: 1100px;
+    margin: 30px auto 0;
+    padding: 0 20px;
+    margin-bottom: 55px !important;
+}
+
+.banner-slider-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: visible;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.banner-track-container {
+    overflow: hidden;
+    width: 100%;
+    cursor: grab;
+    background: transparent !important;
+}
+
+.banner-track-container:active {
+    cursor: grabbing;
+}
+
+.banner-track {
+    display: flex;
+    margin: 0 -8px;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    background: transparent !important;
+}
+
+.banner-slide {
+    position: relative;
+    flex-shrink: 0;
+    padding: 0 8px;
+    box-sizing: border-box;
+    width: 50%;
+    background: transparent !important;
+}
+
+.banner-slide img {
+    width: 100%;
+    aspect-ratio: 16 / 6;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    border-radius: 12px;
+    pointer-events: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive ke HP */
+@media (max-width: 650px) {
+    .banner-slide {
+        width: 100%;
+    }
+
+    .banner-slide img {
+        aspect-ratio: 16 / 8;
+    }
+}
+
+/* Indikator Dots */
+.banner-dots {
+    position: absolute;
+    bottom: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+}
+
+.banner-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.3s ease, width 0.3s ease, border-radius 0.3s ease;
+}
+
+/* Efek Pil Aktif */
+.banner-dot.active {
+    width: 22px;
+    border-radius: 4px;
+    background: #475569;
+}
+
+.banner-empty {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+}
+
+/* modal login */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 380px;
+    width: 90%;
+    padding: 40px 32px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #475569;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #cbd5e1;
+}
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 40px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    transition: color 0.2s;
+}
+
+.toggle-password:hover {
+    color: #1e293b;
+}
+
+.toggle-password svg {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-login-submit {
+    width: 100%;
+    padding: 11px 16px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-bottom: 12px;
+}
+
+.btn-login-submit:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-login-submit:active {
+    background-color: #1e40af;
+}
+
+.btn-nanti-link {
+    width: 100%;
+    padding: 11px 16px;
+    background-color: transparent;
+    color: #64748b;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+.btn-nanti-link:hover {
+    color: #475569;
+    text-decoration: underline;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.tab-button {
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #94a3b8;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    margin-bottom: -2px;
+}
+
+.tab-button.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+}
+
+.tab-button:hover {
+    color: #0f172a;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.alert {
+    color: #e53e3e;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.alert-success {
+    color: #22863a;
+    background: #f0f5e9;
+    border: 1px solid #d4e9cf;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.toggle-text {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.toggle-text button {
+    background: none;
+    border: none;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.toggle-text button:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+    LAYOUT GRID UTAMA (Kunci 4 Kolom Ke Samping)
+    ========================================================================== */
+.grid-4-kolom {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 20px !important;
+    width: 100% !important;
+    margin-bottom: 30px;
+}
+
+.container-diskon-tengah {
+    width: 100% !important;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+/* Responsive Layout */
+@media (max-width: 992px) {
+    .grid-4-kolom {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .grid-4-kolom {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
 
 /* admin panel */
 .panel-container {

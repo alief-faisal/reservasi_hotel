@@ -115,78 +115,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Hotel</title>
-    <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
 
-    body {
-        background-color: #f8fafc;
-        color: #0f172a;
-    }
-
-    .edit-box {
-        max-width: 460px;
-        margin: 60px auto;
-        background: white;
-        padding: 32px;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-    }
-
-    .title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 24px;
-    }
-
-    .form-ctrl {
-        margin-bottom: 16px;
-    }
-
-    .form-ctrl label {
-        display: block;
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 6px;
-        color: #475569;
-    }
-
-    .form-ctrl input,
-    .form-ctrl textarea,
-    .form-ctrl select {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        background: white;
-    }
-
-    .btn-save {
-        background: #0f172a;
-        color: white;
-        padding: 12px;
-        border: none;
-        border-radius: 6px;
-        font-weight: 500;
-        cursor: pointer;
-        width: 100%;
-        margin-top: 10px;
-    }
-
-    .btn-cancel {
-        display: block;
-        text-align: center;
-        text-decoration: none;
-        color: #475569;
-        font-size: 0.88rem;
-        margin-top: 15px;
-    }
-    </style>
+    <!-- Memanggil CSS Terpisah -->
+    <link rel="stylesheet" href="/reservasi_hotel/css/style_navigasi.css">
+    <link rel="stylesheet" href="/reservasi_hotel/css/style_edit.css">
 </head>
 
 <body>
@@ -232,12 +164,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </select>
             </div>
 
-            <hr style="margin: 20px 0; border: none; border-top: 1px dashed #cbd5e1;">
-            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 15px; color: #334155;">Data Kamar</h3>
+            <hr class="form-divider">
+            <h3 class="sub-title">Data Kamar</h3>
 
             <?php foreach($kamar_list as $idx => $kamar): ?>
-            <div style="background: #f8fafc; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
-                <div style="font-weight: 600; color: #0f172a; margin-bottom: 8px;">
+            <div class="kamar-card">
+                <div class="kamar-title">
                     <?= htmlspecialchars($kamar['nama_kamar']); ?> (<?= htmlspecialchars($kamar['tipe_kamar']); ?>)
                 </div>
 
@@ -254,22 +186,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="form-ctrl">
-                    <label>Fasilitas </label>
-                    <div
-                        style="display: flex; flex-direction: column; gap: 8px; padding: 10px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 4px;">
+                    <label>Fasilitas</label>
+                    <div class="fasilitas-container">
                         <?php foreach ($fasilitas_list as $fac): 
                             $checked = in_array($fac['id_fasilitas'], $fasilitas_per_kamar[$kamar['id_kamar']] ?? []) ? 'checked' : '';
                         ?>
-                        <label
-                            style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; font-weight: 400;">
+                        <label class="fasilitas-label">
                             <input type="checkbox" name="fasilitas_kamar_<?= $kamar['id_kamar']; ?>[]"
-                                value="<?= $fac['id_fasilitas']; ?>" <?= $checked; ?> style="cursor: pointer;">
+                                value="<?= $fac['id_fasilitas']; ?>" <?= $checked; ?>>
                             <span><?= htmlspecialchars($fac['nama_fasilitas']); ?></span>
                         </label>
                         <?php endforeach; ?>
                     </div>
-                    <small style="color: #94a3b8; font-size: 0.75rem; margin-top: 4px; display: block;">Pilih maksimal 7
-                        fasilitas</small>
+                    <small class="form-help">Pilih maksimal 7 fasilitas</small>
                 </div>
             </div>
             <?php endforeach; ?>
@@ -279,5 +208,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
     </main>
 </body>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const logoImg = document.querySelector('.brand-logo img');
+    if (logoImg) {
+        logoImg.src = '/reservasi_hotel/assets/logo/logo.png';
+    }
+});
+</script>
 
 </html>

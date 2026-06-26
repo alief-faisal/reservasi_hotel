@@ -73,7 +73,10 @@ if (isset($_POST['proses_pesan'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Hotel - <?= htmlspecialchars($data_hotel['nama_hotel']); ?></title>
-    <link rel="stylesheet" href="style_pesan.php">
+
+    <!-- Keluar satu tingkat folder untuk mencari folder css/ -->
+    <link rel="stylesheet" href="../css/style_navigasi.css">
+    <link rel="stylesheet" href="../css/style_pesan.css">
 </head>
 
 <body>
@@ -117,7 +120,7 @@ if (isset($_POST['proses_pesan'])) {
                 <div class="realtime-price-box"
                     style="margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
                     <span
-                        style="font-size: 0.8rem; color: #64748b; font-weight: 600; text-transform:  display: block; margin-bottom: 4px;">Tarif
+                        style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">Tarif
                         Kamar</span>
                     <div id="displayHarga" style="font-size: 1.6rem; font-weight: 700; color: #dc2626;">
                         Rp - <span style="font-size: 0.85rem; color: #64748b; font-weight: 400;">/malam</span>
@@ -205,7 +208,6 @@ if (isset($_POST['proses_pesan'])) {
                             <span><?= htmlspecialchars($hotel_rekomendasi['lokasi']); ?></span>
                         </div>
 
-
                         <div class="price-wrapper">
                             <span class="price-amount">
                                 <?php if ($diskon > 0): ?>
@@ -234,6 +236,25 @@ if (isset($_POST['proses_pesan'])) {
     </section>
 
     <script>
+    // Perbaikan Otomatis Struktur Navigasi saat Halaman Dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Memperbaiki link gambar logo yang pecah
+        const logoImg = document.querySelector('.brand-logo img');
+        if (logoImg) {
+            logoImg.src = '/reservasi_hotel/assets/logo/logo.png';
+        }
+    });
+
+    // 2. Memperbaiki fungsi klik tombol Masuk & Daftar ke halaman otentikasi yang benar
+    function openLoginModal(type) {
+        if (type === 'login') {
+            window.location.href = '../layanan_autentikasi/masuk.php';
+        } else if (type === 'daftar') {
+            window.location.href = '../layanan_autentikasi/masuk.php?mode=daftar';
+        }
+    }
+
+    // Logika Pemesanan Kamar
     const pilihKamarSelect = document.getElementById('pilihKamar');
     const fasilitasContainer = document.getElementById('fasilitasContainer');
     const daftarFasilitas = document.getElementById('daftarFasilitas');
@@ -258,7 +279,6 @@ if (isset($_POST['proses_pesan'])) {
             return;
         }
 
-        // Hitung perubahan harga otomatis
         let hargaFinal = hargaAsli;
         if (diskonPersen > 0) {
             hargaFinal = hargaAsli * (100 - diskonPersen) / 100;
@@ -271,7 +291,6 @@ if (isset($_POST['proses_pesan'])) {
                 `${formatRupiah(hargaFinal)} <span style="font-size: 0.85rem; color: #64748b; font-weight: 400;">/ malam</span>`;
         }
 
-        // Ambil data fasilitas kamar async
         try {
             const response = await fetch(`get_fasilitas.php?id_kamar=${idKamar}`);
             const fasilitas = await response.json();

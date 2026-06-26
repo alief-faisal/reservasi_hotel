@@ -30,252 +30,10 @@ $hasil = $stmt->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riwayat Pembayaran - GrandStay</title>
-    <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
 
-    body {
-        background-color: #f8fafc;
-        color: #1e293b;
-    }
-
-    .container {
-        max-width: 1000px;
-        margin: 60px auto;
-        padding: 0 20px;
-    }
-
-    .header {
-        margin-bottom: 40px;
-    }
-
-    .header h1 {
-        font-size: 2rem;
-        margin-bottom: 10px;
-        color: #0f172a;
-    }
-
-    .header p {
-        color: #64748b;
-        font-size: 1rem;
-    }
-
-    .payment-history {
-        display: grid;
-        gap: 20px;
-    }
-
-    .payment-card {
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 20px;
-        transition: all 0.3s ease;
-    }
-
-    .payment-card:hover {
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        border-color: #cbd5e1;
-    }
-
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: start;
-        margin-bottom: 15px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-    .hotel-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 5px;
-    }
-
-    .hotel-location {
-        font-size: 0.9rem;
-        color: #64748b;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .status-lunas {
-        background: #c6f6d5;
-        color: #22543d;
-    }
-
-    .status-belum {
-        background: #fed7d7;
-        color: #742a2a;
-    }
-
-    .card-details {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        margin-bottom: 15px;
-    }
-
-    @media (max-width: 600px) {
-        .card-details {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .detail-item {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .detail-label {
-        font-size: 0.8rem;
-        color: #64748b;
-        text-transform: uppercase;
-        margin-bottom: 4px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-    }
-
-    .detail-value {
-        font-size: 0.95rem;
-        color: #0f172a;
-        font-weight: 500;
-    }
-
-    .room-info {
-        background: #f8fafc;
-        padding: 12px;
-        border-radius: 6px;
-        margin: 15px 0;
-    }
-
-    .room-type {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #0f172a;
-        margin-bottom: 5px;
-    }
-
-    .room-dates {
-        font-size: 0.85rem;
-        color: #64748b;
-        display: flex;
-        gap: 15px;
-    }
-
-    .price-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-top: 1px solid #f1f5f9;
-        margin-top: 12px;
-    }
-
-    .price-amount {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #667eea;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
-    }
-
-    .btn {
-        flex: 1;
-        padding: 10px 16px;
-        border: none;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        text-align: center;
-        display: inline-block;
-    }
-
-    .btn-receipt {
-        background: #667eea;
-        color: white;
-    }
-
-    .btn-receipt:hover {
-        background: #5568d3;
-    }
-
-    .btn-pay {
-        background: #f0f4ff;
-        color: #667eea;
-        border: 2px solid #667eea;
-    }
-
-    .btn-pay:hover {
-        background: #e7ecff;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        background: white;
-        border-radius: 8px;
-    }
-
-    .empty-icon {
-        font-size: 3rem;
-        margin-bottom: 20px;
-    }
-
-    .empty-text {
-        font-size: 1.2rem;
-        color: #0f172a;
-        margin-bottom: 10px;
-    }
-
-    .empty-subtext {
-        color: #64748b;
-        margin-bottom: 25px;
-    }
-
-    .btn-home {
-        display: inline-block;
-        background: #667eea;
-        color: white;
-        padding: 10px 24px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: background 0.3s ease;
-    }
-
-    .btn-home:hover {
-        background: #5568d3;
-    }
-
-    .payment-ref {
-        font-size: 0.8rem;
-        color: #64748b;
-        font-family: 'Courier New', monospace;
-        background: #f1f5f9;
-        padding: 4px 8px;
-        border-radius: 4px;
-    }
-    </style>
+    <!-- Panggil CSS Navigasi & Halaman Riwayat secara Eksternal -->
+    <link rel="stylesheet" href="/reservasi_hotel/css/style_navigasi.css">
+    <link rel="stylesheet" href="/reservasi_hotel/css/style_riwayat_pembayaran.css">
 </head>
 
 <body>
@@ -283,7 +41,7 @@ $hasil = $stmt->get_result();
 
     <div class="container">
         <div class="header">
-            <h1>Riwayat Pembayaran </h1>
+            <h1>Riwayat Pembayaran</h1>
             <p>Kelola dan pantau semua transaksi pemesanan Anda</p>
         </div>
 
@@ -298,7 +56,7 @@ $hasil = $stmt->get_result();
                 <div class="card-header">
                     <div>
                         <div class="hotel-title"><?= htmlspecialchars($row['nama_hotel']); ?></div>
-                        <div class="hotel-location"> <?= htmlspecialchars($row['lokasi']); ?></div>
+                        <div class="hotel-location"><?= htmlspecialchars($row['lokasi']); ?></div>
                     </div>
                     <span class="status-badge <?= $status_class; ?>"><?= $status_text; ?></span>
                 </div>
@@ -354,5 +112,15 @@ $hasil = $stmt->get_result();
         <?php endif; ?>
     </div>
 </body>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Memperbaiki path link gambar logo navigasi yang pecah
+    const logoImg = document.querySelector('.brand-logo img');
+    if (logoImg) {
+        logoImg.src = '/reservasi_hotel/assets/logo/logo.png';
+    }
+});
+</script>
 
 </html>
