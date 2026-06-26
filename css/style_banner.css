@@ -22,13 +22,40 @@
     align-items: start;
 }
 
+/* ==========================================================================
+   Responsive Desain untuk Tablet / Ponsel
+   ========================================================================== */
 @media (max-width: 768px) {
     .dashboard-wrapper {
         grid-template-columns: 1fr;
     }
+
+    [class*="search"], [id*="search"], 
+    [class*="cari"], [id*="cari"],
+    form[action*="cari"], form[action*="search"],
+    input[type="search"], input[name*="cari"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 }
 
-/* Sidebar Menu Admin */
+/* MEMASTIKAN LOGO SELALU MUNCUL (DI DESKTOP & MOBILE) */
+.brand-logo, 
+.brand-logo a, 
+.brand-logo img {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* ==========================================================================
+   Sidebar Menu Admin
+   ========================================================================== */
 .admin-sidebar {
     background: white;
     border: 1px solid #e2e8f0;
@@ -75,7 +102,9 @@
     color: white;
 }
 
-/* Konten Utama & Grid Banner */
+/* ==========================================================================
+   Konten Utama & Grid Banner
+   ========================================================================== */
 .box-card {
     background: white;
     border: 1px solid #e2e8f0;
@@ -152,7 +181,9 @@
     margin-bottom: 30px;
 }
 
-/* Form Upload Banner */
+/* ==========================================================================
+   Form Upload Banner
+   ========================================================================== */
 .banner-upload-box {
     margin-top: 20px;
     border-top: 1px dashed #cbd5e1;

@@ -73,7 +73,7 @@ while ($b = $hasil_banner_list->fetch_assoc()) {
 
     <main class="panel-container">
         <header class="panel-header">
-            <h1 class="panel-title">Manajemen Banner Aplikasi</h1>
+            <h1 class="panel-title">Dashboard Manajemen Banner</h1>
         </header>
 
         <div class="dashboard-wrapper">

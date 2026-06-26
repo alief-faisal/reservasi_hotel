@@ -1,4 +1,6 @@
-/* Global Admin Layout & Grid */
+/* ==========================================================================
+   Global Admin Layout & Grid
+   ========================================================================== */
 html {
     scroll-behavior: smooth;
 }
@@ -27,7 +29,9 @@ html {
     margin-top: 20px;
 }
 
-/* Sticky Sidebar Menu Admin */
+/* ==========================================================================
+   Sticky Sidebar Menu Admin
+   ========================================================================== */
 .admin-sidebar {
     position: sticky;
     top: 90px;
@@ -78,7 +82,9 @@ html {
     color: #FFFFFF;
 }
 
-/* Konten Utama Modul Kelola Hotel */
+/* ==========================================================================
+   Konten Utama Modul Kelola Hotel
+   ========================================================================== */
 .admin-main-content {
     display: flex;
     flex-direction: column;
@@ -92,7 +98,30 @@ html {
     padding: 24px;
 }
 
-/* Responsive Desain untuk Tablet / Ponsel */
+/* Tambahan Gaya untuk Tabel / Elemen Data Hotel agar Selaras */
+.hotel-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.hotel-table th, 
+.hotel-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+}
+
+.hotel-table th {
+    background-color: #f8fafc;
+    color: #334155;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   Responsive Desain untuk Tablet / Ponsel
+   ========================================================================== */
 @media (max-width: 992px) {
     .dashboard-wrapper {
         grid-template-columns: 1fr;
@@ -111,5 +140,16 @@ html {
     .sidebar-menu a {
         flex: 1 1 150px;
         justify-content: center;
+    }
+}
+
+/* Solusi Proteksi Logo Navigasi Tetap Muncul di Mobile */
+@media (max-width: 768px) {
+    .brand-logo, 
+    .brand-logo a, 
+    .brand-logo img {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 }

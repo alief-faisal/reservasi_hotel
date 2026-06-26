@@ -1,202 +1,207 @@
-
-
 .search-form-responsive {
-position: relative !important;
+  position: relative !important;
 }
 
 .search-input-wrapper {
-position: relative;
-width: 100%;
+  position: relative;
+  width: 100%;
 }
 
 #searchInput {
-width: 100% !important;
-padding: 10px 18px 10px 40px !important;
-font-size: 0.9rem !important;
-border: none !important;
-border-radius: 9999px !important;
-outline: none !important;
-background-color: #f8fafc !important;
-transition: background-color 0.3s ease, box-shadow 0.3s ease !important;
+  width: 100% !important;
+  padding: 10px 18px 10px 40px !important;
+  font-size: 0.9rem !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  outline: none !important;
+  background-color: #f8fafc !important;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease !important;
 }
 
 #searchInput:focus {
-border-color: transparent !important;
-background-color: white !important;
-box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+  border-color: transparent !important;
+  background-color: white !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
 }
 
 .search-icon {
-position: absolute !important;
-left: 14px !important;
-top: 50% !important;
-transform: translateY(-50%) !important;
-width: 16px !important;
-height: 16px !important;
-fill: #94a3b8 !important;
-pointer-events: none !important;
+  position: absolute !important;
+  left: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 16px !important;
+  height: 16px !important;
+  fill: #94a3b8 !important;
+  pointer-events: none !important;
 }
 
 /* logika animasi placeholder slide up */
 @keyframes slideUpHotelName {
-0% {
-opacity: 1;
-transform: translateY(0);
-content: attr(data-placeholder);
-}
-50% {
-opacity: 0;
-transform: translateY(-15px);
-}
-50.1% {
-opacity: 0;
-transform: translateY(15px);
-}
-100% {
-opacity: 1;
-transform: translateY(0);
-}
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+    content: attr(data-placeholder);
+  }
+  50% {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  50.1% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 #searchInput::placeholder {
-color: #94a3b8;
+  color: #94a3b8;
 }
 
 #searchInput:focus::placeholder {
-color: #94a3b8;
+  color: #94a3b8;
 }
 
 #searchInput.animate-placeholder::placeholder {
-animation: slideUpHotelName 0.6s ease-in-out;
+  animation: slideUpHotelName 0.6s ease-in-out;
 }
 
 /* kontainer dropdown menu & hamburger */
 .user-menu-container {
-position: relative;
-display: flex;
-align-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 /* style struktur tombol hamburger */
 .hamburger-btn {
-display: none !important;
-background: none;
-border: none;
-cursor: pointer;
-padding: 8px;
-width: 40px;
-height: 40px;
-flex-direction: column;
-justify-content: center;
-gap: 8px; /* Jarak antar bar */
-align-items: center;
-z-index: 1020;
+  display: none !important;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  width: 40px;
+  height: 40px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px; /* Jarak antar bar */
+  align-items: center;
+  z-index: 1020;
 }
 
 /* bar hamburger */
 .hamburger-btn span {
-display: block;
-width: 24px;
-height: 3px; 
-background-color: #0f172a;
-border-radius: 999px;
-transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+  display: block;
+  width: 24px;
+  height: 3px;
+  background-color: #0f172a;
+  border-radius: 999px;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease,
+    background-color 0.3s ease;
 }
 
 /* animasi css saat hamburger aktif */
 .hamburger-btn.active span:nth-child(1) {
-transform: translateY(5.5px) rotate(45deg);
+  transform: translateY(5.5px) rotate(45deg);
 }
 
 .hamburger-btn.active span:nth-child(2) {
-transform: translateY(-5.5px) rotate(-45deg);
+  transform: translateY(-5.5px) rotate(-45deg);
 }
 
 .menu-links-wrapper {
-display: flex;
-align-items: center;
-gap: 16px;
-font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.9rem;
 }
 
 /* mobile view */
 @media (max-width: 768px) {
-.brand-logo {
-display: none !important;
-}
+  .brand-logo {
+    display: none !important;
+  }
 
-/* searchbar melebar otomatis mendekati hamburger (mobile view) */
-.nav-wrapper {
-gap: 8px !important;
-flex-grow: 1 !important;
-margin-right: 8px !important;
-}
+  /* searchbar melebar otomatis mendekati hamburger (mobile view) */
+  .nav-wrapper {
+    gap: 8px !important;
+    flex-grow: 1 !important;
+    margin-right: 8px !important;
+  }
 
-.search-form-responsive {
-width: 100% !important;
-max-width: 100% !important;
-margin-left: 0 !important;
-}
+  .search-form-responsive {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+  }
 
-#searchInput {
-padding: 8px 14px 8px 32px !important;
-font-size: 0.85rem !important;
-}
+  #searchInput {
+    padding: 8px 14px 8px 32px !important;
+    font-size: 0.85rem !important;
+  }
 
-.hamburger-btn {
-display: flex !important;
-}
+  .hamburger-btn {
+    display: flex !important;
+  }
 
-.menu-links-wrapper {
-display: none;
-position: absolute;
-top: 100%;
-right: 0;
-margin-top: 12px;
-background-color: #ffffff;
-box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-border: 1px solid #e2e8f0;
-border-radius: 12px;
-padding: 12px;
-flex-direction: column;
-align-items: stretch !important;
-gap: 10px !important;
-min-width: 190px;
-z-index: 1010;
-}
+  .menu-links-wrapper {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 12px;
+    background-color: #ffffff;
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 10px !important;
+    min-width: 190px;
+    z-index: 1010;
+  }
 
-.menu-links-wrapper.show {
-display: flex;
-}
+  .menu-links-wrapper.show {
+    display: flex;
+  }
 
-.menu-links-wrapper a,
-.menu-links-wrapper button,
-.menu-links-wrapper span {
-display: block;
-width: 100%;
-text-align: left;
-padding: 8px 12px;
-box-sizing: border-box;
-}
+  .menu-links-wrapper a,
+  .menu-links-wrapper button,
+  .menu-links-wrapper span {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    box-sizing: border-box;
+  }
 
-.menu-links-wrapper .divider {
-display: none !important;
-}
+  .menu-links-wrapper .divider {
+    display: none !important;
+  }
 
-/* tombol masuk & daftar mobile */
-.menu-links-wrapper .btn-masuk,
-.menu-links-wrapper .btn-daftar,
-.menu-links-wrapper .btn-keluar {
-text-align: center !important;
-background: #2563eb !important;
-color: #ffffff !important;
-font-weight: 600 !important;
-border-radius: 6px !important;
-padding: 8px 16px !important;
-margin-top: 4px;
-}
+  /* tombol masuk & daftar mobile */
+  .menu-links-wrapper .btn-masuk,
+  .menu-links-wrapper .btn-daftar,
+  .menu-links-wrapper .btn-keluar {
+    text-align: center !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    padding: 8px 16px !important;
+    margin-top: 4px;
+  }
 
-.menu-links-wrapper .btn-keluar {
-background: #E60000 !important;
-}
+  .menu-links-wrapper .btn-keluar {
+    background: #e60000 !important;
+  }
 }

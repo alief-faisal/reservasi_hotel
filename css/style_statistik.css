@@ -22,13 +22,42 @@
     align-items: start;
 }
 
+/* ==========================================================================
+   Responsive Desain untuk Tablet / Ponsel
+   ========================================================================== */
 @media (max-width: 768px) {
     .dashboard-wrapper {
         grid-template-columns: 1fr;
     }
+
+    /* === PAKSA HILANGKAN SEARCH BAR DI MOBILE === */
+    /* Menargetkan segala class, id, form, atau input yang mengandung kata 'cari' atau 'search' */
+    [class*="search"], [id*="search"], 
+    [class*="cari"], [id*="cari"],
+    form[action*="cari"], form[action*="search"],
+    input[type="search"], input[name*="cari"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 }
 
-/* Sidebar Menu Admin */
+/* MEMASTIKAN LOGO NAVIGATION SELALU MUNCUL (DESKTOP & MOBILE) */
+.brand-logo, 
+.brand-logo a, 
+.brand-logo img {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* ==========================================================================
+   Sidebar Menu Admin
+   ========================================================================== */
 .admin-sidebar {
     background: white;
     border: 1px solid #e2e8f0;
@@ -75,7 +104,9 @@
     color: white;
 }
 
-/* Area Konten Grafik */
+/* ==========================================================================
+   Area Konten Grafik
+   ========================================================================== */
 .box-card {
     background: white;
     border: 1px solid #e2e8f0;
