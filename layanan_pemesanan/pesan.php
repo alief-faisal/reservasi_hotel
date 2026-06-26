@@ -164,8 +164,8 @@ if (isset($_POST['proses_pesan'])) {
                 </form>
                 <?php else: ?>
                 <div
-                    style="text-align: center; color: #64748b; padding: 15px; background: #f1f5f9; border-radius: 6px; font-weight: 500; font-size: 0.9rem;">
-                    Anda masuk sebagai Admin. Silakan gunakan akun pelanggan untuk memesan.
+                    style="text-align: center; color: #f1f5f9; padding: 15px; background: #f1f5f9; border-radius: 6px; font-weight: 500; font-size: 0.9rem;">
+                    Akun Admin
                 </div>
                 <?php endif; ?>
             </div>
