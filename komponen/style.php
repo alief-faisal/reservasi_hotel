@@ -553,12 +553,24 @@ body {
 .price-original {
     font-size: 0.8rem;
     color: #9ca3af;
-    text-decoration: line-through;
-    text-decoration-color: #ef4444;
-    text-decoration-thickness: 2px;
     font-style: italic;
     font-weight: 500;
     display: block;
+    position: relative;
+    display: inline-block;
+}
+
+/* badge diskon */
+.price-original::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    background-color: #ef4444;
+    transform: rotate(-3deg);
+    transform-origin: center;
 }
 
 .discount-badge {

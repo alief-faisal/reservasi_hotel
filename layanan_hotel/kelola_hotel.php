@@ -187,7 +187,7 @@ if ($pencarian_admin !== '') {
                             <div class="form-group">
                                 <label>Wilayah Banten</label>
                                 <select name="lokasi" required>
-                                    <option value="" disabled selected>-- Pilih Wilayah --</option>
+                                    <option value="" disabled selected> Pilih Wilayah </option>
                                     <option value="Kota Serang">Kota Serang</option>
                                     <option value="Kota Tangerang">Kota Tangerang</option>
                                     <option value="Kota Tangerang Selatan">Kota Tangerang Selatan</option>
@@ -205,7 +205,7 @@ if ($pencarian_admin !== '') {
                             <div class="form-group">
                                 <label>Hotel Bintang</label>
                                 <select name="rating" required>
-                                    <option value="" disabled selected>-- Pilih Bintang Hotel --</option>
+                                    <option value="" disabled selected> Pilih Bintang Hotel </option>
                                     <option value="1">1 Bintang</option>
                                     <option value="2">2 Bintang</option>
                                     <option value="3">3 Bintang</option>
@@ -216,10 +216,9 @@ if ($pencarian_admin !== '') {
 
                             <div class="sub-section-title">Tipe Kamar 1</div>
                             <div class="form-group">
-                                <label>Pilih Tipe</label>
+                                <label>Tipe Kamar</label>
                                 <select name="tipe_kamar_1" required>
                                     <option value="Standard" selected>Standard Room</option>
-                                    <option value="Deluxe">Deluxe Room</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -250,10 +249,9 @@ if ($pencarian_admin !== '') {
 
                             <div class="sub-section-title">Tipe Kamar 2</div>
                             <div class="form-group">
-                                <label>Pilih Tipe</label>
+                                <label>Tipe Kamar</label>
                                 <select name="tipe_kamar_2" required>
                                     <option value="Deluxe" selected>Deluxe Room</option>
-                                    <option value="Standard">Standard Room</option>
                                 </select>
                             </div>
                             <div class="form-group">

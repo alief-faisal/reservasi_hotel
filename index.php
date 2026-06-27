@@ -46,11 +46,9 @@ if ($hasil_favorit && $hasil_favorit->num_rows > 0) {
     $hotel_favorit_id = $favorit_row['id_hotel'];
 }
 
-/* ============================================================
-   AMBIL DAFTAR WISHLIST USER YANG SEDANG LOGIN
-   ============================================================ */
-$loved_ids = []; // default kosong (belum login atau belum punya wishlist)
-if (isset($_SESSION['id_pengguna'])) {
+/* logika button love hilang ketika login role admin */
+$loved_ids = [];
+if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
     $id_sesi = intval($_SESSION['id_pengguna']);
     $q_love  = $koneksi->query("SELECT id_hotel FROM wishlist WHERE id_pengguna = $id_sesi");
     if ($q_love) {
