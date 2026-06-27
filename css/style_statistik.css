@@ -1,138 +1,135 @@
 /* Layout Umum & Pembungkus Utama */
 .panel-container {
-    max-width: 1100px;
-    margin: 40px auto;
-    padding: 0 20px;
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
 }
 
 .panel-header {
-    margin-bottom: 24px;
+  margin-bottom: 24px;
 }
 
 .panel-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #0f172a;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .dashboard-wrapper {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 30px;
-    align-items: start;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 30px;
+  align-items: start;
 }
 
-/* ==========================================================================
-   Responsive Desain untuk Tablet / Ponsel
-   ========================================================================== */
+/* tablet & mobile view */
 @media (max-width: 768px) {
-    .dashboard-wrapper {
-        grid-template-columns: 1fr;
-    }
+  .dashboard-wrapper {
+    grid-template-columns: 1fr;
+  }
 
-    /* === PAKSA HILANGKAN SEARCH BAR DI MOBILE === */
-    /* Menargetkan segala class, id, form, atau input yang mengandung kata 'cari' atau 'search' */
-    [class*="search"], [id*="search"], 
-    [class*="cari"], [id*="cari"],
-    form[action*="cari"], form[action*="search"],
-    input[type="search"], input[name*="cari"] {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        width: 0 !important;
-        height: 0 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
+  /* paksa hilangkan search bar di mobile */
+  [class*="search"],
+  [id*="search"],
+  [class*="cari"],
+  [id*="cari"],
+  form[action*="cari"],
+  form[action*="search"],
+  input[type="search"],
+  input[name*="cari"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
 }
 
-/* MEMASTIKAN LOGO NAVIGATION SELALU MUNCUL (DESKTOP & MOBILE) */
-.brand-logo, 
-.brand-logo a, 
+/* logo navigation statistik */
+.brand-logo,
+.brand-logo a,
 .brand-logo img {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-/* ==========================================================================
-   Sidebar Menu Admin
-   ========================================================================== */
+/* sidebar menu admin */
 .admin-sidebar {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 20px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
 }
 
 .sidebar-title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #64748b;
-    letter-spacing: 0.05em;
-    margin-bottom: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
 }
 
 .sidebar-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .sidebar-menu li {
-    margin-bottom: 8px;
+  margin-bottom: 8px;
 }
 
 .sidebar-menu li a {
-    display: block;
-    padding: 10px 14px;
-    color: #334155;
-    text-decoration: none;
-    font-weight: 500;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+  display: block;
+  padding: 10px 14px;
+  color: #334155;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .sidebar-menu li a:hover {
-    background: #f1f5f9;
-    color: #0f172a;
+  background: #f1f5f9;
+  color: #0f172a;
 }
 
 .sidebar-menu li a.active {
-    background: #004cff;
-    color: white;
+  background: #004cff;
+  color: white;
 }
 
-/* ==========================================================================
-   Area Konten Grafik
-   ========================================================================== */
+/* Konten Grafik */
 .box-card {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 24px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 24px;
 }
 
 .stats-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #0f172a;
-    margin-bottom: 24px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 24px;
 }
 
 .chart-container {
-    position: relative;
-    height: 350px;
-    width: 100%;
+  position: relative;
+  height: 350px;
+  width: 100%;
 }
 
 .stats-empty {
-    text-align: center;
-    padding: 60px 20px;
-    color: #64748b;
-    font-size: 0.95rem;
-    background: #f8fafc;
-    border-radius: 6px;
-    border: 1px dashed #cbd5e1;
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+  font-size: 0.95rem;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px dashed #cbd5e1;
 }

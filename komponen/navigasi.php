@@ -17,9 +17,23 @@ while ($row = $hasilHotel->fetch_assoc()) {
     $daftarHotel[] = $row['nama_hotel'];
 }
 $hotelJSON = json_encode($daftarHotel);
+
+/* ============================================================
+   HITUNG JUMLAH WISHLIST USER UNTUK BADGE NAVBAR
+   ============================================================ */
+$jumlah_wishlist = 0;
+if (isset($_SESSION['id_pengguna']) && $_SESSION['peran'] !== 'admin') {
+    $id_nav = intval($_SESSION['id_pengguna']);
+    $q_badge = $koneksi->query("SELECT COUNT(*) as total FROM wishlist WHERE id_pengguna = $id_nav");
+    if ($q_badge) {
+        $jumlah_wishlist = intval($q_badge->fetch_assoc()['total']);
+    }
+}
 ?>
 
-<link rel="stylesheet" type="text/css" href="css/style_navigasi.css">
+<link rel="stylesheet" type="text/css" href="/reservasi_hotel/css/style_navigasi.css">
+<!-- CSS Love dimuat di navigasi agar badge langsung tampil -->
+<link rel="stylesheet" type="text/css" href="/reservasi_hotel/css/love.css">
 
 <header
     style="width: 100%; background-color: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 16px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);">
@@ -28,7 +42,7 @@ $hotelJSON = json_encode($daftarHotel);
 
         <div class="nav-wrapper" style="display: flex; align-items: center; gap: 32px; flex-grow: 1;">
             <a href="/reservasi_hotel/index.php" class="brand-logo" style="display: flex; align-items: center;">
-                <img src="assets/logo/logo.png" alt="Logo Kelompok 1"
+                <img src="/reservasi_hotel/assets/logo/logo.png" alt="Logo Kelompok 1"
                     style="height: 40px; width: auto; object-fit: contain;">
             </a>
 
@@ -58,8 +72,29 @@ $hotelJSON = json_encode($daftarHotel);
 
             <div class="menu-links-wrapper" id="menuLinks">
                 <?php if (isset($_SESSION['peran'])): ?>
+
                 <?php if ($_SESSION['peran'] !== 'admin'): ?>
+                <!-- Nama pengguna -->
                 <span style="color: #334155; font-weight: 200;"><?= htmlspecialchars($_SESSION['nama']); ?></span>
+                <span class="divider" style="color: #cbd5e1;">|</span>
+
+                <!-- ===== IKON LOVE / WISHLIST ===== -->
+                <a href="/reservasi_hotel/layanan_wishlist/halaman_love.php" class="nav-love-link"
+                    title="Hotel Tersimpan">
+                    <!-- SVG Hati -->
+                    <svg class="nav-love-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                    <!-- Badge jumlah -->
+                    <span class="nav-love-badge" data-count="<?= $jumlah_wishlist; ?>"
+                        style="display: <?= $jumlah_wishlist > 0 ? 'flex' : 'none'; ?>;">
+                        <?= $jumlah_wishlist > 0 ? $jumlah_wishlist : ''; ?>
+                    </span>
+                    <span class="love-label">Wishlist</span>
+                </a>
+                <!-- ================================= -->
+
                 <span class="divider" style="color: #cbd5e1;">|</span>
                 <a href="/reservasi_hotel/layanan_pembayaran/riwayat_pembayaran.php"
                     style="color: #0f172a; text-decoration: none; font-weight: 600;">Riwayat Pembayaran</a>
@@ -73,7 +108,9 @@ $hotelJSON = json_encode($daftarHotel);
                 <span class="divider" style="color: #cbd5e1;">|</span>
                 <a href="/reservasi_hotel/layanan_autentikasi/keluar.php" class="btn-keluar"
                     style="background: #E60000; border: none; color: #ffffff; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.9rem; padding: 6px 16px; border-radius: 6px;">Keluar</a>
+
                 <?php else: ?>
+                <!-- Belum login -->
                 <button type="button" class="btn-masuk" onclick="openLoginModal('login')"
                     style="background: none; border: none; color: #2563eb; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
                     Masuk
@@ -110,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* logika animasi placeholder */
+    /* logika animasi placeholder searchbar */
     const searchInput = document.getElementById('searchInput');
     if (!searchInput) return;
 

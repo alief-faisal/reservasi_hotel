@@ -1,0 +1,325 @@
+/* ============================================================
+   css/love.css  —  Fitur Love / Wishlist Hotel
+   ============================================================ */
+
+/* ----------------------------------------------------------
+   TOMBOL LOVE DI CARD
+   ---------------------------------------------------------- */
+.btn-love {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 20;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.30);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    transition: background 0.22s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    padding: 0;
+    outline: none;
+    flex-shrink: 0;
+}
+
+.btn-love:hover {
+    background: rgba(255, 255, 255, 0.55);
+    transform: scale(1.12);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.20);
+}
+
+.btn-love:active {
+    transform: scale(0.94);
+}
+
+/* SVG hati di dalam tombol */
+.btn-love .love-icon {
+    width: 18px;
+    height: 18px;
+    fill: #ffffff;
+    stroke: #ffffff;
+    stroke-width: 1.5;
+    transition: fill 0.22s ease, stroke 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: block;
+    flex-shrink: 0;
+}
+
+/* State: sudah di-love (merah) */
+.btn-love.loved .love-icon {
+    fill: #ef4444;
+    stroke: #ef4444;
+    transform: scale(1.18);
+}
+
+/* Animasi pop saat klik */
+@keyframes lovePop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.40); }
+    70%  { transform: scale(0.90); }
+    100% { transform: scale(1.18); }
+}
+
+.btn-love.love-animate .love-icon {
+    animation: lovePop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ----------------------------------------------------------
+   IKON LOVE DI NAVIGASI
+   ---------------------------------------------------------- */
+.nav-love-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    color: #0f172a;
+    font-weight: 600;
+    font-size: 0.9rem;
+    position: relative;
+    transition: color 0.18s ease;
+}
+
+.nav-love-link:hover {
+    color: #ef4444;
+}
+
+.nav-love-icon {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: #0f172a;
+    stroke-width: 2;
+    transition: fill 0.18s ease, stroke 0.18s ease;
+    flex-shrink: 0;
+}
+
+.nav-love-link:hover .nav-love-icon {
+    fill: #ef4444;
+    stroke: #ef4444;
+}
+
+/* Badge jumlah wishlist */
+.nav-love-badge {
+    position: absolute;
+    top: -7px;
+    right: -8px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    line-height: 1;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    pointer-events: none;
+}
+
+.nav-love-badge[data-count="0"],
+.nav-love-badge:empty {
+    display: none;
+}
+
+/* ----------------------------------------------------------
+   HALAMAN LOVE / WISHLIST
+   ---------------------------------------------------------- */
+.love-page-container {
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.love-page-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.love-page-title svg {
+    width: 28px;
+    height: 28px;
+    fill: #ef4444;
+    stroke: #ef4444;
+    flex-shrink: 0;
+}
+
+.love-page-subtitle {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 36px;
+}
+
+/* Grid card wishlist — sama persis dgn index.php */
+.love-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 992px) {
+    .love-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .love-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+}
+
+/* Empty state khusus halaman love */
+.love-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: #94a3b8;
+}
+
+.love-empty svg {
+    width: 64px;
+    height: 64px;
+    fill: none;
+    stroke: #cbd5e1;
+    stroke-width: 1.5;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.love-empty h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 8px;
+}
+
+.love-empty p {
+    font-size: 0.88rem;
+    margin-bottom: 24px;
+}
+
+.love-empty a {
+    display: inline-block;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 10px 24px;
+    border-radius: 6px;
+    transition: background 0.18s;
+}
+
+.love-empty a:hover {
+    background: #1d4ed8;
+}
+
+/* ----------------------------------------------------------
+   CARD SIMETRIS — price-wrapper selalu di bawah (push ke bottom)
+   Berlaku untuk card di index.php maupun halaman_love.php
+   ---------------------------------------------------------- */
+
+/* Pastikan .card-link stretch penuh di dalam grid */
+.card-link,
+.card-link-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* card-hotel selalu isi penuh tinggi grid cell */
+.card-hotel {
+    height: 100%;
+}
+
+/* card-body flex-column: price selalu nempel bawah */
+.card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Area harga: selalu dorong ke bawah, tinggi minimum tetap */
+.price-wrapper {
+    margin-top: auto;
+    /* Reservasi ruang untuk 2 baris harga (dengan/tanpa diskon) */
+    min-height: 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-top: 8px;
+}
+
+/* Baris harga coret + badge diskon — selalu ada ruangnya */
+.price-row-original {
+    min-height: 22px; /* tetap ada tinggi meski tidak ada diskon */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ----------------------------------------------------------
+   TOMBOL UNLOVE — merah solid, active scale
+   ---------------------------------------------------------- */
+.btn-unlove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 7px 12px;
+    background: #dc2626;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    width: 100%;
+    transition: background 0.18s ease, transform 0.14s ease;
+    outline: none;
+}
+
+.btn-unlove:hover {
+    background: #b91c1c;
+}
+
+.btn-unlove:active {
+    transform: scale(0.95);
+    background: #991b1b;
+}
+
+.btn-unlove svg {
+    width: 13px;
+    height: 13px;
+    fill: #ffffff;
+    stroke: none;
+    flex-shrink: 0;
+}
+
+/* ----------------------------------------------------------
+   RESPONSIVE NAVIGASI LOVE ICON
+   ---------------------------------------------------------- */
+@media (max-width: 768px) {
+    .nav-love-link span.love-label {
+        display: none; /* Sembunyikan teks, tampilkan ikon saja */
+    }
+}

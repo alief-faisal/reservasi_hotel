@@ -31,7 +31,7 @@ $pesanan_counts = json_encode(array_map(fn($i) => $i['jumlah_pesanan'], $stats_d
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistik Penjualan - Admin</title>
 
-    <!-- Memanggil CSS Global, Navigasi, dan Modul Statistik -->
+    <!--  memanggil css global, navigasi, dan modul statistik -->
     <?php include '../komponen/style.php'; ?>
     <link rel="stylesheet" href="/reservasi_hotel/css/style_navigasi.css">
     <link rel="stylesheet" href="/reservasi_hotel/css/style_statistik.css">
@@ -46,7 +46,7 @@ $pesanan_counts = json_encode(array_map(fn($i) => $i['jumlah_pesanan'], $stats_d
         </header>
 
         <div class="dashboard-wrapper">
-            <!-- Sidebar navigasi panel admin -->
+            <!-- sidebar navigasi panel admin -->
             <aside class="admin-sidebar">
                 <div class="sidebar-title">Menu Utama</div>
                 <ul class="sidebar-menu">
@@ -56,7 +56,7 @@ $pesanan_counts = json_encode(array_map(fn($i) => $i['jumlah_pesanan'], $stats_d
                 </ul>
             </aside>
 
-            <!-- Bagian Grafik Statistik Penjualan -->
+            <!-- grafik statistik penjualan -->
             <div class="admin-main-content">
                 <section class="stats-section box-card">
                     <h2 class="stats-title">📊 Grafik Reservasi Hari Ini (<?= date('d M Y'); ?>)</h2>
@@ -73,17 +73,17 @@ $pesanan_counts = json_encode(array_map(fn($i) => $i['jumlah_pesanan'], $stats_d
         </div>
     </main>
 
-    <!-- Pustaka Grafik Chart.js -->
+    <!-- pustaka grafik chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Fix Logo Path di Komponen Navigasi
+        // logo path di komponen navigasi
         const logoImg = document.querySelector('.brand-logo img');
         if (logoImg) {
             logoImg.src = '/reservasi_hotel/assets/logo/logo.png';
         }
 
-        // Render Grafik Jika Data Stats Tersedia
+        // render grafik jika data stats tersedia
         <?php if (!empty($stats_data)): ?>
         const ctx = document.getElementById('salesChart').getContext('2d');
         new Chart(ctx, {
