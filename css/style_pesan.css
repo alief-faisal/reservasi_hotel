@@ -30,16 +30,57 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     margin-bottom: 25px;
+    overflow: hidden; /* Ditambahkan agar gambar rounded mengikuti kartu induk */
 }
 
-/* detail gambar */
+/* ====================================================
+   MODIFIKASI UTAMA: Gambar satu blok penuh tanpa padding
+   ==================================================== */
+.hotel-detail-card {
+    padding: 0 0 24px 0; /* Menghilangkan padding atas, kiri, kanan kartu utama */
+}
+
+.detail-img-container {
+    position: relative;
+    width: 100%;
+}
+
 .detail-img {
     width: 100%;
     height: 450px;
     object-fit: cover;
     background: #cbd5e1;
-    border-radius: 8px;
+    border-top-left-radius: 11px;  /* Menyesuaikan border radius kartu */
+    border-top-right-radius: 11px; /* Menyesuaikan border radius kartu */
     display: block;
+}
+
+/* Konten Teks di bawah gambar dikasih padding manual kembali */
+.hotel-info-content {
+    padding: 25px 24px 0 24px;
+}
+
+/* Tombol Back Khusus Mobile */
+.mobile-back-btn {
+    display: none; /* Sembunyi secara default di desktop */
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(30, 41, 59, 0.4); /* Background abu transparan */
+    backdrop-filter: blur(8px); /* Efek blur kaca */
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.mobile-back-btn:hover {
+    background-color: rgba(30, 41, 59, 0.6);
 }
 
 .location-tag {
@@ -184,19 +225,6 @@ body {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
-.rating-stars {
-    display: flex;
-    gap: 2px;
-    align-items: center;
-}
-
-.star-icon {
-    width: 16px;
-    height: 16px;
-    fill: #f97316;
-    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
-}
-
 .img-wrapper {
     width: 100%;
     height: 180px;
@@ -232,13 +260,6 @@ body {
     font-weight: 600;
     color: #0f172a;
     margin-bottom: 10px;
-}
-
-.card-text {
-    color: #475569;
-    font-size: 0.88rem;
-    line-height: 1.5;
-    margin-bottom: 15px;
 }
 
 .price-wrapper {
@@ -281,10 +302,6 @@ body {
     border-radius: 3px;
 }
 
-/* =====================================================
-   TAMBAHKAN INI DI BAGIAN PALING BAWAH style_pesan.css
-   ===================================================== */
-
 /* ===== PETA LOKASI HOTEL (Leaflet) ===== */
 .hotel-map-section {
     margin-top: 28px;
@@ -297,9 +314,6 @@ body {
     font-weight: 700;
     color: #0f172a;
     margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
 }
 
 #hotel-leaflet-map {
@@ -343,8 +357,45 @@ body {
     color: #713f12;
     margin-top: 10px;
 }
+
 /* Responsivitas */
 @media (max-width: 1200px) { .rekomendasi-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
 @media (max-width: 768px) { .rekomendasi-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px) { .rekomendasi-grid { grid-template-columns: 1fr; } }
+
+/* ====================================================
+   MODIFIKASI KHUSUS MOBILE: Gambar Full Screen Kanan-Kiri
+   ==================================================== */
+@media (max-width: 480px) { 
+    .rekomendasi-grid { grid-template-columns: 1fr; } 
+
+    .main-layout {
+        padding: 0; /* Hilangkan padding luar layout agar block card mobile menyentuh tepi layar */
+        margin-top: 0;
+    }
+
+    .hotel-detail-card {
+        border-radius: 0; /* Hilangkan rounded luar agar menyatu full di mobile */
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        margin-bottom: 15px;
+    }
+
+    .detail-img-container {
+        width: 100%;
+    }
+
+    .detail-img {
+        border-radius: 0 !important; /* KHUSUS MOBILE: Tidak rounded bawah / atas */
+        height: 280px; /* Diperkecil sedikit agar pas proporsi layar HP */
+    }
+
+    .hotel-info-content {
+        padding: 20px 16px 0 16px; /* Padding teks konten diatur ulang agar rapi di HP */
+    }
+
+    .mobile-back-btn {
+        display: flex; /* Aktifkan tombol chevron khusus mobile */
+    }
+}

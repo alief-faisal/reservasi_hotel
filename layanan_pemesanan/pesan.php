@@ -85,7 +85,6 @@ $punya_koordinat = ($hotel_lat !== null && $hotel_lng !== null);
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 </head>
 
 <body>
@@ -94,16 +93,29 @@ $punya_koordinat = ($hotel_lat !== null && $hotel_lng !== null);
 
     <main class="main-layout">
         <div class="left-column">
-            <div class="block-card">
-                <?php
-                    $nama_foto = $data_hotel['foto'];
-                    $path_foto = (empty($nama_foto) || $nama_foto == 'default.jpg' || !file_exists("../assets/" . $nama_foto))
-                        ? "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&h=450&q=80"
-                        : "/reservasi_hotel/assets/" . $nama_foto;
-                ?>
-                <img src="<?= $path_foto; ?>" alt="" class="detail-img">
+            <!-- PENGUBAHAN: Menambahkan class khusus hotel-detail-card -->
+            <div class="block-card hotel-detail-card">
 
-                <div class="hotel-info-content" style="margin-top: 25px;">
+                <!-- PENGUBAHAN: Gambar dibungkus container agar bisa diatur mepet kanan-kiri blok -->
+                <div class="detail-img-container">
+                    <?php
+                        $nama_foto = $data_hotel['foto'];
+                        $path_foto = (empty($nama_foto) || $nama_foto == 'default.jpg' || !file_exists("../assets/" . $nama_foto))
+                            ? "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&h=450&q=80"
+                            : "/reservasi_hotel/assets/" . $nama_foto;
+                    ?>
+                    <img src="<?= $path_foto; ?>" alt="" class="detail-img">
+
+                    <!-- PENGUBAHAN: Tombol kembali khusus mobile di dalam gambar pojok kiri atas -->
+                    <a href="javascript:history.back()" class="mobile-back-btn" aria-label="Kembali">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="#ffffff" />
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Pembungkus konten teks agar tetap memiliki padding yang rapi -->
+                <div class="hotel-info-content">
                     <div class="location-tag">
                         <svg class="icon-location" viewBox="0 0 24 24" width="16" height="16">
                             <path
@@ -200,7 +212,7 @@ $punya_koordinat = ($hotel_lat !== null && $hotel_lng !== null);
                 </form>
                 <?php else: ?>
                 <div
-                    style="text-align: center; color: #f1f5f9; padding: 15px; background: #f1f5f9; border-radius: 6px; font-weight: 500; font-size: 0.9rem;">
+                    style="text-align: center; color: #475569; padding: 15px; background: #f1f5f9; border-radius: 6px; font-weight: 500; font-size: 0.9rem;">
                     Akun Admin
                 </div>
                 <?php endif; ?>
@@ -304,7 +316,6 @@ $punya_koordinat = ($hotel_lat !== null && $hotel_lng !== null);
             </div>`
         ).openPopup();
 
-        /* Perbaikan rendering jika peta berada di dalam tab/accordion tersembunyi */
         setTimeout(() => map.invalidateSize(), 300);
     });
     <?php endif; ?>

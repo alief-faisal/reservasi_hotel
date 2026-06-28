@@ -91,7 +91,6 @@ if (isset($_SESSION['id_pengguna']) && $_SESSION['peran'] !== 'admin') {
                         style="display: <?= $jumlah_wishlist > 0 ? 'flex' : 'none'; ?>;">
                         <?= $jumlah_wishlist > 0 ? $jumlah_wishlist : ''; ?>
                     </span>
-                    <span class="love-label">Wishlist</span>
                 </a>
                 <!-- ================================= -->
 

@@ -192,9 +192,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: #ffffff; /* Mengubah tombol jadi Putih Bersih */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); /* Bayangan halus agar tombol putih kelihatan jelas */
   transition: background 0.22s ease, transform 0.18s ease;
   padding: 0;
   outline: none;
@@ -202,7 +201,7 @@
 }
 
 .btn-love:hover {
-  background: rgba(255, 255, 255, 0.55);
+  background: #f8fafc; /* Efek hover tipis */
   transform: scale(1.12);
 }
 
@@ -210,17 +209,19 @@
   transform: scale(0.94);
 }
 
+/* SEBELUM DIPENCET: Love putih dengan border hitam */
 .btn-love .love-icon {
   width: 18px;
   height: 18px;
-  fill: #ffffff;
-  stroke: #ffffff;
-  stroke-width: 1.5;
+  fill: #ffffff;          /* Warna lovenya putih */
+  stroke: #000000;        /* Border lovenya hitam */
+  stroke-width: 2;        /* Dipertebal sedikit biar border hitam tegas */
   transition: fill 0.22s ease, stroke 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
   display: block;
   flex-shrink: 0;
 }
 
+/* SETELAH DIPENCET: Love merah penuh */
 .btn-love.loved .love-icon {
   fill: #ef4444;
   stroke: #ef4444;
