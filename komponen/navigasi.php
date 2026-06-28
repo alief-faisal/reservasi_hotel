@@ -36,9 +36,9 @@ if (isset($_SESSION['id_pengguna']) && $_SESSION['peran'] !== 'admin') {
 <link rel="stylesheet" type="text/css" href="/reservasi_hotel/css/love.css">
 
 <header
-    style="width: 100%; background-color: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 16px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);">
+    style="width: 100%; background-color: #0A0036; padding: 16px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);">
     <div
-        style="max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;">
+        style="max-width: 1300px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;">
 
         <div class="nav-wrapper" style="display: flex; align-items: center; gap: 32px; flex-grow: 1;">
             <a href="/reservasi_hotel/index.php" class="brand-logo" style="display: flex; align-items: center;">
@@ -75,7 +75,7 @@ if (isset($_SESSION['id_pengguna']) && $_SESSION['peran'] !== 'admin') {
 
                 <?php if ($_SESSION['peran'] !== 'admin'): ?>
                 <!-- Nama pengguna -->
-                <span style="color: #334155; font-weight: 200;"><?= htmlspecialchars($_SESSION['nama']); ?></span>
+                <span style="color: #FFFFFF; font-weight: 200;"><?= htmlspecialchars($_SESSION['nama']); ?></span>
                 <span class="divider" style="color: #cbd5e1;">|</span>
 
                 <!-- ===== IKON LOVE / WISHLIST ===== -->
@@ -97,12 +97,12 @@ if (isset($_SESSION['id_pengguna']) && $_SESSION['peran'] !== 'admin') {
 
                 <span class="divider" style="color: #cbd5e1;">|</span>
                 <a href="/reservasi_hotel/layanan_pembayaran/riwayat_pembayaran.php"
-                    style="color: #0f172a; text-decoration: none; font-weight: 600;">Riwayat Pembayaran</a>
+                    style="color: #FFFFFF; text-decoration: none; font-weight: 600;">Riwayat Pembayaran</a>
                 <?php endif; ?>
 
                 <?php if ($_SESSION['peran'] === 'admin'): ?>
                 <a href="/reservasi_hotel/layanan_hotel/kelola_hotel.php"
-                    style="color: #0f172a; text-decoration: none; font-weight: 600;">Admin Panel</a>
+                    style="color: #FFFFFF; text-decoration: none; font-weight: 600;">Admin Panel</a>
                 <?php endif; ?>
 
                 <span class="divider" style="color: #cbd5e1;">|</span>
@@ -112,7 +112,7 @@ if (isset($_SESSION['id_pengguna']) && $_SESSION['peran'] !== 'admin') {
                 <?php else: ?>
                 <!-- Belum login -->
                 <button type="button" class="btn-masuk" onclick="openLoginModal('login')"
-                    style="background: none; border: none; color: #2563eb; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+                    style="background: none; border: none; color: #FFFFFF; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
                     Masuk
                 </button>
                 <button type="button" class="btn-daftar" onclick="openLoginModal('daftar')"

@@ -1,6 +1,184 @@
 /* css/love.css — fitur love / wishlist hotel */
 
-/* tombol love di card */
+/* ==========================================================================
+   A. STRUKTUR GRID & CARD SIMETRIS MUTLAK (Kunci Utama Tinggi Sama Rata)
+   ========================================================================== */
+
+.love-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  align-items: stretch; /* Memaksa semua kolom sebaris memiliki tinggi sama */
+}
+
+/* Wrapper luar card */
+.card-link-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Mengikuti tinggi penuh baris grid */
+}
+
+/* Tag Link <a> */
+.card-link {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: inherit;
+}
+
+/* Artikel Card Utama */
+.card-hotel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+
+/* Pembungkus Foto */
+.img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 180px; /* Atur tinggi foto agar seragam */
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Area Konten Teks */
+.card-body {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Memaksa bagian teks mengambil sisa ruang kosong */
+}
+
+/* Penataan Konten Teks */
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
+}
+
+.card-rating {
+  margin-bottom: 6px;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star-icon {
+  width: 14px;
+  height: 14px;
+  fill: #f59e0b;
+}
+
+.card-meta {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+/* Area Harga (Otomatis didorong ke dasar terbawah card-body) */
+.price-wrapper {
+  margin-top: auto; 
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.price-original {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  text-decoration: line-through;
+  font-weight: 400;
+}
+
+.discount-badge {
+  background: #fee2e2;
+  color: #ef4444;
+  font-size: 0.7rem;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.price-suffix {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+
+/* ==========================================================================
+   B. TOMBOL HAPUS (IKON TONG SAMPAH BULAT MERAH - POJOK KANAN ATAS GAMBAR)
+   ========================================================================== */
+.btn-unlove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 30; /* Di atas link card agar bisa diklik */
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #dc2626; /* Latar Belakang Merah */
+  color: #ffffff;      /* Warna Ikon Putih */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: background 0.2s ease, transform 0.15s ease;
+  padding: 0;
+}
+
+.btn-unlove:hover {
+  background: #b91c1c; /* Merah gelap saat hover */
+  transform: scale(1.1);
+}
+
+.btn-unlove:active {
+  transform: scale(0.92);
+}
+
+/* Mengatur ukuran & struktur SVG didalamnya */
+.btn-unlove svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: #ffffff; /* Memastikan outline SVG berwarna putih */
+}
+
+
+/* ==========================================================================
+   C. DECORATION & INTERFACE LAINNYA (NAVBAR & EMPTY STATE)
+   ========================================================================== */
+
+/* Animasi pop bawaan project */
 .btn-love {
   position: absolute;
   top: 10px;
@@ -17,9 +195,7 @@
   background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  transition:
-    background 0.22s ease,
-    transform 0.18s ease;
+  transition: background 0.22s ease, transform 0.18s ease;
   padding: 0;
   outline: none;
   flex-shrink: 0;
@@ -34,74 +210,56 @@
   transform: scale(0.94);
 }
 
-/* svg hati di dalam tombol */
 .btn-love .love-icon {
   width: 18px;
   height: 18px;
   fill: #ffffff;
   stroke: #ffffff;
   stroke-width: 1.5;
-  transition:
-    fill 0.22s ease,
-    stroke 0.22s ease,
-    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: fill 0.22s ease, stroke 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
   display: block;
   flex-shrink: 0;
 }
 
-/* state: sudah di-love (merah) */
 .btn-love.loved .love-icon {
   fill: #ef4444;
   stroke: #ef4444;
   transform: scale(1.18);
 }
 
-/* animasi pop saat klik */
 @keyframes lovePop {
-  0% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.4);
-  }
-  70% {
-    transform: scale(0.9);
-  }
-  100% {
-    transform: scale(1.18);
-  }
+  0% { transform: scale(1); }
+  40% { transform: scale(1.4); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1.18); }
 }
 
 .btn-love.love-animate .love-icon {
   animation: lovePop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* ikon love di navigasi */
+/* Navigasi */
 .nav-love-link {
   display: flex;
   align-items: center;
   gap: 5px;
   text-decoration: none;
-  color: #0f172a;
+  color: #ffffff;
   font-weight: 600;
   font-size: 0.9rem;
   position: relative;
   transition: color 0.18s ease;
 }
 
-.nav-love-link:hover {
-  color: #ef4444;
-}
+.nav-love-link:hover { color: #ef4444; }
 
 .nav-love-icon {
   width: 22px;
   height: 22px;
   fill: none;
-  stroke: #0f172a;
+  stroke: #ffffff;
   stroke-width: 2;
-  transition:
-    fill 0.18s ease,
-    stroke 0.18s ease;
+  transition: fill 0.18s ease, stroke 0.18s ease;
   flex-shrink: 0;
 }
 
@@ -110,7 +268,6 @@
   stroke: #ef4444;
 }
 
-/* badge jumlah wishlist */
 .nav-love-badge {
   position: absolute;
   top: -7px;
@@ -131,11 +288,9 @@
 }
 
 .nav-love-badge[data-count="0"],
-.nav-love-badge:empty {
-  display: none;
-}
+.nav-love-badge:empty { display: none; }
 
-/* halaman love / wishlist */
+/* Halaman Container */
 .love-page-container {
   max-width: 1100px;
   margin: 60px auto;
@@ -145,20 +300,12 @@
 .love-page-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #0f172a;
+  color: #000000;
   margin-bottom: 8px;
   letter-spacing: -0.5px;
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.love-page-title svg {
-  width: 28px;
-  height: 28px;
-  fill: #ef4444;
-  stroke: #ef4444;
-  flex-shrink: 0;
 }
 
 .love-page-subtitle {
@@ -167,27 +314,7 @@
   margin-bottom: 36px;
 }
 
-/* grid card wishlist — sama persis dgn index.php */
-.love-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
-
-@media (max-width: 992px) {
-  .love-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 576px) {
-  .love-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-}
-
-/* empty state khusus halaman love */
+/* Empty State */
 .love-empty {
   grid-column: 1 / -1;
   text-align: center;
@@ -231,47 +358,18 @@
   transition: background 0.18s;
 }
 
-.love-empty a:hover {
-  background: #1d4ed8;
+.love-empty a:hover { background: #1d4ed8; }
+
+/* Responsif Media Queries */
+@media (max-width: 992px) {
+  .love-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* tombol hapus dari wishlist di halaman love */
-.btn-unlove {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 10px;
-  padding: 6px 12px;
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
-  border-radius: 5px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background 0.18s,
-    border-color 0.18s;
-  text-decoration: none;
-  width: 100%;
-  justify-content: center;
+@media (max-width: 576px) {
+  .love-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .img-wrapper { height: 140px; } /* Menyesuaikan tinggi gambar di hp */
 }
 
-.btn-unlove:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
-}
-
-.btn-unlove svg {
-  width: 13px;
-  height: 13px;
-  fill: #dc2626;
-  flex-shrink: 0;
-}
-
-/* responsive navigasi love icon */
 @media (max-width: 768px) {
-  .nav-love-link span.love-label {
-    display: none; /* sembunyikan teks, tampilkan ikon saja */
-  }
+  .nav-love-link span.love-label { display: none; }
 }

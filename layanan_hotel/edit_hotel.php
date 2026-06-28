@@ -53,17 +53,18 @@ if (!$data_hotel) {
 
 // Proses Update Data
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nama = $_POST['nama_hotel'];
+    $nama      = $_POST['nama_hotel'];
     $deskripsi = $_POST['deskripsi'];
-    $lokasi = $_POST['lokasi'];
-    $rating = intval($_POST['rating']);
+    $lokasi    = $_POST['lokasi'];
+    $rating    = intval($_POST['rating']);
+    $latitude  = !empty($_POST['latitude'])  ? floatval($_POST['latitude'])  : null;
+    $longitude = !empty($_POST['longitude']) ? floatval($_POST['longitude']) : null;
     $nama_file_final = $data_hotel['foto'];
 
     if (isset($_FILES['foto_hotel']) && $_FILES['foto_hotel']['error'] === 0) {
         $nama_file_asal = $_FILES['foto_hotel']['name'];
-        $tmp_file = $_FILES['foto_hotel']['tmp_name'];
-        $ekstensi = strtolower(pathinfo($nama_file_asal, PATHINFO_EXTENSION));
-        
+        $tmp_file       = $_FILES['foto_hotel']['tmp_name'];
+        $ekstensi       = strtolower(pathinfo($nama_file_asal, PATHINFO_EXTENSION));
         if (in_array($ekstensi, ['jpg', 'jpeg', 'png'])) {
             if ($data_hotel['foto'] && $data_hotel['foto'] !== 'default.jpg') {
                 @unlink("../assets/" . $data_hotel['foto']);
@@ -73,26 +74,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Update data hotel
-    $stmt_up = $koneksi->prepare("UPDATE hotel SET nama_hotel = ?, deskripsi = ?, lokasi = ?, foto = ?, rating = ? WHERE id_hotel = ?");
-    $stmt_up->bind_param("ssssii", $nama, $deskripsi, $lokasi, $nama_file_final, $rating, $id_edit);
-    
+    // Update data hotel termasuk koordinat
+    $stmt_up = $koneksi->prepare("UPDATE hotel SET nama_hotel = ?, deskripsi = ?, lokasi = ?, foto = ?, rating = ?, latitude = ?, longitude = ? WHERE id_hotel = ?");
+    $stmt_up->bind_param("ssssiidi", $nama, $deskripsi, $lokasi, $nama_file_final, $rating, $latitude, $longitude, $id_edit);
+
     if ($stmt_up->execute()) {
-        // Update semua kamar
         foreach($kamar_list as $idx => $kamar) {
-            $harga_baru = floatval($_POST["harga_kamar_$idx"] ?? 0);
+            $harga_baru  = floatval($_POST["harga_kamar_$idx"] ?? 0);
             $diskon_baru = intval($_POST["diskon_kamar_$idx"] ?? 0);
-            
+
             $stmt_km = $koneksi->prepare("UPDATE kamar SET harga_per_malam = ?, diskon_persen = ? WHERE id_kamar = ?");
             $stmt_km->bind_param("dii", $harga_baru, $diskon_baru, $kamar['id_kamar']);
             $stmt_km->execute();
 
-            // Update fasilitas kamar dan hapus fasilitas lama
             $stmt_del_fac = $koneksi->prepare("DELETE FROM kamar_fasilitas WHERE id_kamar = ?");
             $stmt_del_fac->bind_param("i", $kamar['id_kamar']);
             $stmt_del_fac->execute();
 
-            // Tambah fasilitas baru
             if (isset($_POST["fasilitas_kamar_{$kamar['id_kamar']}"])) {
                 $fasilitas_baru = $_POST["fasilitas_kamar_{$kamar['id_kamar']}"];
                 foreach (array_slice($fasilitas_baru, 0, 7) as $id_fasilitas) {
@@ -103,10 +101,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
         }
-        
+
         echo "<script>alert('Hotel berhasil diperbarui.'); window.location='kelola_hotel.php';</script>";
     }
 }
+
+// Nilai koordinat saat ini (untuk pre-fill)
+$current_lat = !empty($data_hotel['latitude'])  ? floatval($data_hotel['latitude'])  : '';
+$current_lng = !empty($data_hotel['longitude']) ? floatval($data_hotel['longitude']) : '';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -114,11 +116,124 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Hotel</title>
+    <title>Edit Hotel - <?= htmlspecialchars($data_hotel['nama_hotel']); ?></title>
 
-    <!-- Memanggil CSS Terpisah -->
     <link rel="stylesheet" href="/reservasi_hotel/css/style_navigasi.css">
     <link rel="stylesheet" href="/reservasi_hotel/css/style_edit.css">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+    /* ===== KOORDINAT SECTION ===== */
+    .koordinat-group {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .koordinat-group .koord-title {
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .koordinat-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .koordinat-row label {
+        font-size: 0.78rem;
+        color: #475569;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .koordinat-row input {
+        width: 100%;
+        padding: 9px 11px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.15s;
+    }
+
+    .koordinat-row input:focus {
+        border-color: #dc2626;
+    }
+
+    .btn-preview-map {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-bottom: 12px;
+    }
+
+    .btn-preview-map:hover {
+        background: #1d4ed8;
+    }
+
+    #edit-map-container {
+        display: none;
+        height: 220px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #cbd5e1;
+    }
+
+    #edit-preview-map {
+        height: 100%;
+    }
+
+    /* status badge koordinat */
+    .koord-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+    }
+
+    .koord-status.ada {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .koord-status.belum {
+        background: #fef9c3;
+        color: #713f12;
+    }
+
+    .koord-hint {
+        font-size: 0.72rem;
+        color: #94a3b8;
+        margin-top: 8px;
+        line-height: 1.5;
+    }
+    </style>
 </head>
 
 <body>
@@ -127,6 +242,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <main class="edit-box">
         <h2 class="title">Edit Data Hotel</h2>
         <form action="" method="POST" enctype="multipart/form-data">
+
             <div class="form-ctrl">
                 <label>Nama Hotel</label>
                 <input type="text" name="nama_hotel" value="<?= htmlspecialchars($data_hotel['nama_hotel']); ?>"
@@ -141,7 +257,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label>Wilayah Banten</label>
                 <select name="lokasi" required>
                     <?php
-                    $wilayah = ["Kota Serang", "Kota Tangerang", "Kota Tangerang Selatan", "Kota Cilegon", "Kabupaten Serang", "Kabupaten Tangerang", "Kabupaten Pandeglang", "Kabupaten Lebak"];
+                    $wilayah = ["Kota Serang","Kota Tangerang","Kota Tangerang Selatan","Kota Cilegon","Kabupaten Serang","Kabupaten Tangerang","Kabupaten Pandeglang","Kabupaten Lebak"];
                     foreach($wilayah as $w) {
                         $selected = ($data_hotel['lokasi'] === $w) ? 'selected' : '';
                         echo "<option value='$w' $selected>$w</option>";
@@ -156,13 +272,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="form-ctrl">
                 <label>Rating Bintang ⭐</label>
                 <select name="rating" required>
-                    <option value="1" <?= ($data_hotel['rating'] == 1) ? 'selected' : ''; ?>>1 Bintang</option>
-                    <option value="2" <?= ($data_hotel['rating'] == 2) ? 'selected' : ''; ?>>2 Bintang</option>
-                    <option value="3" <?= ($data_hotel['rating'] == 3) ? 'selected' : ''; ?>>3 Bintang</option>
-                    <option value="4" <?= ($data_hotel['rating'] == 4) ? 'selected' : ''; ?>>4 Bintang</option>
-                    <option value="5" <?= ($data_hotel['rating'] == 5) ? 'selected' : ''; ?>>5 Bintang</option>
+                    <?php for($b = 1; $b <= 5; $b++): ?>
+                    <option value="<?= $b; ?>" <?= ($data_hotel['rating'] == $b) ? 'selected' : ''; ?>>
+                        <?= $b; ?> Bintang
+                    </option>
+                    <?php endfor; ?>
                 </select>
             </div>
+
+            <!-- ===== KOORDINAT LOKASI ===== -->
+            <div class="koordinat-group">
+                <span class="koord-title">📍 Koordinat Lokasi (untuk peta di halaman hotel)</span>
+
+                <?php if ($current_lat !== '' && $current_lng !== ''): ?>
+                <div class="koord-status ada">✅ Koordinat sudah tersimpan</div>
+                <?php else: ?>
+                <div class="koord-status belum">⚠️ Koordinat belum diisi</div>
+                <?php endif; ?>
+
+                <div class="koordinat-row">
+                    <div>
+                        <label>Latitude</label>
+                        <input type="number" name="latitude" id="editLatitude" value="<?= $current_lat; ?>"
+                            placeholder="-6.1234567" step="0.0000001" min="-90" max="90">
+                    </div>
+                    <div>
+                        <label>Longitude</label>
+                        <input type="number" name="longitude" id="editLongitude" value="<?= $current_lng; ?>"
+                            placeholder="106.1234567" step="0.0000001" min="-180" max="180">
+                    </div>
+                </div>
+
+                <button type="button" class="btn-preview-map" onclick="previewEditMap()">
+                    🗺️ Preview / Cek Lokasi di Peta
+                </button>
+
+                <div class="koord-hint">
+                    💡 Cara cari koordinat: buka <a href="https://maps.google.com" target="_blank">Google Maps</a>
+                    → klik kanan lokasi hotel → klik angka koordinat untuk menyalin.<br>
+                    Atau klik langsung pada peta preview di bawah untuk mengisi koordinat otomatis.
+                </div>
+
+                <div id="edit-map-container">
+                    <div id="edit-preview-map"></div>
+                </div>
+            </div>
+            <!-- ===== END KOORDINAT ===== -->
 
             <hr class="form-divider">
             <h3 class="sub-title">Data Kamar</h3>
@@ -172,23 +327,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="kamar-title">
                     <?= htmlspecialchars($kamar['nama_kamar']); ?> (<?= htmlspecialchars($kamar['tipe_kamar']); ?>)
                 </div>
-
                 <div class="form-ctrl">
                     <label>Harga Per Malam (Rp)</label>
                     <input type="number" name="harga_kamar_<?= $idx; ?>"
                         value="<?= intval($kamar['harga_per_malam']); ?>" required>
                 </div>
-
                 <div class="form-ctrl">
                     <label>Diskon (%)</label>
                     <input type="number" name="diskon_kamar_<?= $idx; ?>" placeholder="0" min="0" max="100"
                         value="<?= intval($kamar['diskon_persen'] ?? 0); ?>">
                 </div>
-
                 <div class="form-ctrl">
                     <label>Fasilitas</label>
                     <div class="fasilitas-container">
-                        <?php foreach ($fasilitas_list as $fac): 
+                        <?php foreach ($fasilitas_list as $fac):
                             $checked = in_array($fac['id_fasilitas'], $fasilitas_per_kamar[$kamar['id_kamar']] ?? []) ? 'checked' : '';
                         ?>
                         <label class="fasilitas-label">
@@ -207,14 +359,77 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <a href="kelola_hotel.php" class="btn-cancel">Batal & Kembali</a>
         </form>
     </main>
-</body>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const logoImg = document.querySelector('.brand-logo img');
-    if (logoImg) {
-        logoImg.src = '/reservasi_hotel/assets/logo/logo.png';
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const logoImg = document.querySelector('.brand-logo img');
+        if (logoImg) logoImg.src = '/reservasi_hotel/assets/logo/logo.png';
+
+        // Jika sudah ada koordinat, langsung tampilkan peta
+        const lat = parseFloat(document.getElementById('editLatitude').value);
+        const lng = parseFloat(document.getElementById('editLongitude').value);
+        if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+            previewEditMap();
+        }
+    });
+
+    let editMap = null;
+    let editMarker = null;
+    let mapClickAttached = false;
+
+    function previewEditMap() {
+        const lat = parseFloat(document.getElementById('editLatitude').value);
+        const lng = parseFloat(document.getElementById('editLongitude').value);
+
+        // Jika kosong, gunakan pusat Banten sebagai default
+        const centerLat = (!isNaN(lat) && lat !== 0) ? lat : -6.4058;
+        const centerLng = (!isNaN(lng) && lng !== 0) ? lng : 106.0640;
+
+        const container = document.getElementById('edit-map-container');
+        container.style.display = 'block';
+
+        if (!editMap) {
+            editMap = L.map('edit-preview-map').setView([centerLat, centerLng], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(editMap);
+        } else {
+            editMap.setView([centerLat, centerLng], 15);
+        }
+
+        // Pasang / pindahkan marker
+        if (!isNaN(lat) && lat !== 0 && !isNaN(lng) && lng !== 0) {
+            if (editMarker) {
+                editMarker.setLatLng([lat, lng]);
+            } else {
+                editMarker = L.marker([lat, lng]).addTo(editMap);
+            }
+            editMarker.bindPopup('📍 <?= addslashes(htmlspecialchars($data_hotel['nama_hotel'])); ?>').openPopup();
+        }
+
+        // Klik peta → isi input koordinat otomatis (attach sekali)
+        if (!mapClickAttached) {
+            editMap.on('click', function(e) {
+                const {
+                    lat,
+                    lng
+                } = e.latlng;
+                document.getElementById('editLatitude').value = lat.toFixed(7);
+                document.getElementById('editLongitude').value = lng.toFixed(7);
+
+                if (editMarker) {
+                    editMarker.setLatLng([lat, lng]);
+                } else {
+                    editMarker = L.marker([lat, lng]).addTo(editMap);
+                }
+                editMarker.bindPopup('📍 Lokasi dipilih').openPopup();
+            });
+            mapClickAttached = true;
+        }
+
+        setTimeout(() => editMap.invalidateSize(), 150);
     }
-});
-</script>
+    </script>
+</body>
 
 </html>

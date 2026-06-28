@@ -23,34 +23,39 @@
 }
 
 /* ==========================================================================
-   Responsive Desain untuk Tablet / Ponsel
+   KONTROL SEARCHBAR (Disembunyikan Total di Desktop & Mobile)
    ========================================================================== */
-@media (max-width: 768px) {
-    .dashboard-wrapper {
-        grid-template-columns: 1fr;
-    }
-
-    [class*="search"], [id*="search"], 
-    [class*="cari"], [id*="cari"],
-    form[action*="cari"], form[action*="search"],
-    input[type="search"], input[name*="cari"] {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        width: 0 !important;
-        height: 0 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
+[class*="search"], [id*="search"], 
+[class*="cari"], [id*="cari"],
+form[action*="cari"], form[action*="search"],
+input[type="search"], input[name*="cari"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
-/* MEMASTIKAN LOGO SELALU MUNCUL (DI DESKTOP & MOBILE) */
+/* ==========================================================================
+   PROTEKSI LOGO (Menjaga Ukuran Proporsional di Desktop & Mobile)
+   ========================================================================== */
 .brand-logo, 
-.brand-logo a, 
-.brand-logo img {
+.brand-logo a {
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
+    align-items: center;
+}
+
+.brand-logo img {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* Membatasi ukuran logo baru Anda agar tidak meluap kebesaran */
+    max-height: 40px !important; 
+    width: auto !important; 
 }
 
 /* ==========================================================================
@@ -243,4 +248,13 @@
 
 .btn-upload-banner:hover {
     background: #1d4ed8;
+}
+
+/* ==========================================================================
+   Responsive Desain untuk Tablet / Ponsel
+   ========================================================================== */
+@media (max-width: 768px) {
+    .dashboard-wrapper {
+        grid-template-columns: 1fr;
+    }
 }

@@ -5,15 +5,23 @@ $koneksi = new mysqli("localhost", "root", "", "reservasi_hotel");
 /* search bar/pencarian */
 $keyword = isset($_GET['cari']) ? $koneksi->real_escape_string($_GET['cari']) : '';
 
-/* Ambil Semua Data Berdasarkan Keyword */
-$query = "SELECT h.*, k.harga_per_malam, k.diskon_persen FROM hotel h LEFT JOIN kamar k ON h.id_hotel = k.id_hotel";
+/* Ambil Semua Data Beserta Info Diskon Per Tipe Kamar */
+$query = "SELECT h.*,
+            MAX(CASE WHEN k.tipe_kamar = 'Standard' THEN k.harga_per_malam END) AS harga_standard,
+            MAX(CASE WHEN k.tipe_kamar = 'Standard' THEN k.diskon_persen END) AS diskon_standard,
+            MAX(CASE WHEN k.tipe_kamar = 'Deluxe'   THEN k.harga_per_malam END) AS harga_deluxe,
+            MAX(CASE WHEN k.tipe_kamar = 'Deluxe'   THEN k.diskon_persen END) AS diskon_deluxe,
+            MIN(k.harga_per_malam) AS harga_per_malam,
+            MAX(k.diskon_persen)   AS diskon_persen
+          FROM hotel h
+          LEFT JOIN kamar k ON h.id_hotel = k.id_hotel";
 if ($keyword !== '') {
     $query .= " WHERE h.nama_hotel LIKE '%$keyword%' OR h.lokasi LIKE '%$keyword%'";
 }
 $query .= " GROUP BY h.id_hotel ORDER BY RAND()";
 $hasil_raw = $koneksi->query($query);
 
-$hotel_biasa = [];
+$hotel_biasa  = [];
 $hotel_diskon = [];
 
 if ($hasil_raw && $hasil_raw->num_rows > 0) {
@@ -39,7 +47,7 @@ $query_favorit = "SELECT h.id_hotel, COUNT(DISTINCT b.id_pemesanan) as jumlah_pe
                   GROUP BY h.id_hotel
                   ORDER BY jumlah_pesanan DESC
                   LIMIT 1";
-$hasil_favorit   = $koneksi->query($query_favorit);
+$hasil_favorit    = $koneksi->query($query_favorit);
 $hotel_favorit_id = null;
 if ($hasil_favorit && $hasil_favorit->num_rows > 0) {
     $favorit_row      = $hasil_favorit->fetch_assoc();
@@ -57,6 +65,27 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
         }
     }
 }
+
+/**
+ * Helper: tentukan badge diskon yang ditampilkan.
+ * Prioritas: jika keduanya diskon → tampilkan Deluxe (ungu).
+ * Hanya Standard diskon → hijau.
+ * Hanya Deluxe diskon   → ungu.
+ * Tidak ada              → false.
+ */
+function getBadgeDiskon(array $row): array|false {
+    $ds = intval($row['diskon_standard'] ?? 0);
+    $dd = intval($row['diskon_deluxe']   ?? 0);
+
+    if ($ds > 0 && $dd > 0) {
+        return ['label' => "Diskon Deluxe -{$dd}%", 'class' => 'badge-diskon-deluxe'];
+    } elseif ($dd > 0) {
+        return ['label' => "Diskon Deluxe -{$dd}%", 'class' => 'badge-diskon-deluxe'];
+    } elseif ($ds > 0) {
+        return ['label' => "Diskon Standard -{$ds}%", 'class' => 'badge-diskon-standard'];
+    }
+    return false;
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -65,7 +94,6 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kel1 | reservasi_hotel</title>
-    <link rel="icon" type="image/png" href="assets/logo/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
@@ -75,7 +103,6 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
     <!-- CSS Love (Wishlist) -->
     <link rel="stylesheet" href="/reservasi_hotel/css/love.css">
 
-    <!-- CSS FIX: Desktop 4 Kolom Sejajar, Mobile Simetris & Lancar Di-drag Mouse -->
     <style>
     /* ================= KONDISI DESKTOP ================= */
     .grid-diskon-slider {
@@ -85,7 +112,7 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
         width: 100%;
     }
 
-    /* ================= KONDISI MOBILE (DIBAWAH 768px) ================= */
+    /* ================= KONDISI MOBILE ================= */
     @media (max-width: 768px) {
         .slider-diskon-wrapper {
             overflow: hidden;
@@ -125,6 +152,46 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
             }
         }
     }
+
+    /* ================= BADGE DISKON ================= */
+    .badge-diskon-strip {
+        display: block;
+        width: 100%;
+        text-align: center;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        padding: 5px 10px;
+        border-radius: 0 0 6px 6px;
+        margin-top: auto;
+        /* melekat di bawah card */
+    }
+
+    .badge-diskon-standard {
+        background: linear-gradient(90deg, #16a34a, #22c55e);
+        color: #fff;
+    }
+
+    .badge-diskon-deluxe {
+        background: linear-gradient(90deg, #7c3aed, #a855f7);
+        color: #fff;
+    }
+
+    /* Pastikan card-hotel pakai flex column agar badge nempel bawah */
+    .card-hotel {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-hotel .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-hotel .price-wrapper {
+        margin-top: auto;
+    }
     </style>
 </head>
 
@@ -140,9 +207,7 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
 
         <section class="flex-hotel" style="display: block !important;">
 
-            <!-- ==================================================================
-                 SKELETON CONTAINER
-                 ================================================================== -->
+            <!-- SKELETON CONTAINER -->
             <div id="skeleton-container" style="width: 100% !important; display: block !important;">
                 <div class="grid-4-kolom">
                     <?php for ($i = 0; $i < 4; $i++): ?>
@@ -190,9 +255,7 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
                 <?php endif; ?>
             </div>
 
-            <!-- ==================================================================
-                 KONTEN ASLI
-                 ================================================================== -->
+            <!-- KONTEN ASLI -->
             <div id="actual-content" style="width: 100% !important; display: block !important;">
                 <?php if ($jumlah_hotel_biasa > 0 || $jumlah_hotel_diskon > 0): ?>
 
@@ -203,7 +266,8 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
                     for ($i = 0; $i < $jumlah_hotel_biasa; $i++):
                         $row = $hotel_biasa[$i];
                         $counter++;
-                        $id_hotel = $row['id_hotel']; // dipakai oleh btn_love.php
+                        $id_hotel = $row['id_hotel'];
+                        $badge    = getBadgeDiskon($row);
                     ?>
                     <a href="/reservasi_hotel/layanan_pemesanan/pesan.php?id_hotel=<?= $row['id_hotel']; ?>"
                         class="card-link">
@@ -211,11 +275,9 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
 
                             <?php
                             $nama_foto = $row['foto'];
-                            if (empty($nama_foto) || $nama_foto == 'default.jpg' || !file_exists("assets/" . $nama_foto)) {
-                                $path_foto = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80";
-                            } else {
-                                $path_foto = "/reservasi_hotel/assets/" . $nama_foto;
-                            }
+                            $path_foto = (empty($nama_foto) || $nama_foto == 'default.jpg' || !file_exists("assets/" . $nama_foto))
+                                ? "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80"
+                                : "/reservasi_hotel/assets/" . $nama_foto;
                             ?>
 
                             <?php if ($hotel_favorit_id == $row['id_hotel']): ?>
@@ -268,6 +330,14 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
                                     </span>
                                 </div>
                             </div>
+
+                            <!-- BADGE DISKON MEMBENTANG DI BAWAH CARD -->
+                            <?php if ($badge): ?>
+                            <span class="badge-diskon-strip <?= $badge['class']; ?>">
+                                🏷️ <?= $badge['label']; ?>
+                            </span>
+                            <?php endif; ?>
+
                         </article>
                     </a>
                     <?php
@@ -284,18 +354,17 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
                         <div class="slider-diskon-wrapper">
                             <div class="grid-diskon-slider">
                                 <?php foreach ($hotel_diskon as $row_diskon):
-                                    $id_hotel = $row_diskon['id_hotel']; // dipakai btn_love.php
+                                    $id_hotel    = $row_diskon['id_hotel'];
+                                    $badge_diskon = getBadgeDiskon($row_diskon);
                                 ?>
                                 <a href="/reservasi_hotel/layanan_pemesanan/pesan.php?id_hotel=<?= $row_diskon['id_hotel']; ?>"
                                     class="card-link">
                                     <article class="card-hotel">
                                         <?php
                                         $nama_foto = $row_diskon['foto'];
-                                        if (empty($nama_foto) || $nama_foto == 'default.jpg' || !file_exists("assets/" . $nama_foto)) {
-                                            $path_foto = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80";
-                                        } else {
-                                            $path_foto = "/reservasi_hotel/assets/" . $nama_foto;
-                                        }
+                                        $path_foto = (empty($nama_foto) || $nama_foto == 'default.jpg' || !file_exists("assets/" . $nama_foto))
+                                            ? "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80"
+                                            : "/reservasi_hotel/assets/" . $nama_foto;
                                         ?>
                                         <?php if ($hotel_favorit_id == $row_diskon['id_hotel']): ?>
                                         <div class="favorite-badge">Favorit</div>
@@ -346,6 +415,14 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
                                                 </span>
                                             </div>
                                         </div>
+
+                                        <!-- BADGE DISKON MEMBENTANG -->
+                                        <?php if ($badge_diskon): ?>
+                                        <span class="badge-diskon-strip <?= $badge_diskon['class']; ?>">
+                                            🏷️ <?= $badge_diskon['label']; ?>
+                                        </span>
+                                        <?php endif; ?>
+
                                     </article>
                                 </a>
                                 <?php endforeach; ?>
@@ -360,18 +437,17 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
                 <div class="grid-4-kolom">
                     <?php for ($i = 4; $i < $jumlah_hotel_biasa; $i++):
                         $row      = $hotel_biasa[$i];
-                        $id_hotel = $row['id_hotel']; // dipakai btn_love.php
+                        $id_hotel = $row['id_hotel'];
+                        $badge    = getBadgeDiskon($row);
                     ?>
                     <a href="/reservasi_hotel/layanan_pemesanan/pesan.php?id_hotel=<?= $row['id_hotel']; ?>"
                         class="card-link">
                         <article class="card-hotel">
                             <?php
                             $nama_foto = $row['foto'];
-                            if (empty($nama_foto) || $nama_foto == 'default.jpg' || !file_exists("assets/" . $nama_foto)) {
-                                $path_foto = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80";
-                            } else {
-                                $path_foto = "/reservasi_hotel/assets/" . $nama_foto;
-                            }
+                            $path_foto = (empty($nama_foto) || $nama_foto == 'default.jpg' || !file_exists("assets/" . $nama_foto))
+                                ? "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80"
+                                : "/reservasi_hotel/assets/" . $nama_foto;
                             ?>
                             <?php if ($hotel_favorit_id == $row['id_hotel']): ?>
                             <div class="favorite-badge">Favorit</div>
@@ -423,6 +499,14 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
                                     </span>
                                 </div>
                             </div>
+
+                            <!-- BADGE DISKON MEMBENTANG -->
+                            <?php if ($badge): ?>
+                            <span class="badge-diskon-strip <?= $badge['class']; ?>">
+                                🏷️ <?= $badge['label']; ?>
+                            </span>
+                            <?php endif; ?>
+
                         </article>
                     </a>
                     <?php endfor; ?>
@@ -443,13 +527,10 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
     <script>
     document.addEventListener("DOMContentLoaded", function() {
         const wrappers = document.querySelectorAll('.slider-diskon-wrapper');
-
         wrappers.forEach(wrapper => {
             const slider = wrapper.querySelector('.grid-diskon-slider');
-            let isDown = false;
-            let startX;
-            let scrollLeft;
-            let isDragging = false;
+            let isDown = false,
+                startX, scrollLeft, isDragging = false;
 
             wrapper.addEventListener('mousedown', (e) => {
                 if (window.innerWidth > 768) return;
@@ -459,26 +540,21 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
                 scrollLeft = slider.scrollLeft;
                 isDragging = false;
             });
-
             wrapper.addEventListener('mouseleave', () => {
                 isDown = false;
                 wrapper.style.cursor = 'grab';
             });
-
             wrapper.addEventListener('mouseup', () => {
                 isDown = false;
                 wrapper.style.cursor = 'grab';
             });
-
             wrapper.addEventListener('mousemove', (e) => {
                 if (!isDown) return;
                 isDragging = true;
                 e.preventDefault();
                 const x = e.pageX - slider.offsetLeft;
-                const walk = (x - startX) * 1.5;
-                slider.scrollLeft = scrollLeft - walk;
+                slider.scrollLeft = scrollLeft - (x - startX) * 1.5;
             });
-
             const links = wrapper.querySelectorAll('.card-link');
             links.forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -486,39 +562,25 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
                 });
             });
         });
-
         if (window.innerWidth <= 768) {
             document.querySelectorAll('.slider-diskon-wrapper').forEach(w => w.style.cursor = 'grab');
         }
     });
     </script>
 
-    <!-- ============================================================
-         JAVASCRIPT LOVE / WISHLIST
-         ============================================================ -->
+    <!-- JAVASCRIPT LOVE / WISHLIST -->
     <script>
-    // Status login dari PHP (aman karena tidak menyimpan data sensitif)
     const userLoggedIn = <?= isset($_SESSION['id_pengguna']) ? 'true' : 'false'; ?>;
 
-    /**
-     * Toggle love: klik tombol hati di card hotel
-     */
     function toggleLove(event, btn) {
-        event.preventDefault(); // Jangan ikut buka link card
-        event.stopPropagation(); // Jangan bubble ke <a> parent
-
-        // Belum login → arahkan ke halaman masuk
+        event.preventDefault();
+        event.stopPropagation();
         if (!userLoggedIn) {
             window.location.href = '/reservasi_hotel/layanan_autentikasi/masuk.php';
             return;
         }
-
         const idHotel = btn.getAttribute('data-hotel-id');
-        const sudahLove = btn.getAttribute('data-loved') === '1';
-
-        // Disable sementara agar tidak double klik
         btn.disabled = true;
-
         fetch('/reservasi_hotel/layanan_wishlist/toggle_love.php', {
                 method: 'POST',
                 headers: {
@@ -530,39 +592,28 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
             .then(data => {
                 if (data.success) {
                     if (data.loved) {
-                        // Baru di-love
                         btn.classList.add('loved');
                         btn.setAttribute('data-loved', '1');
                         btn.setAttribute('title', 'Hapus dari wishlist');
                         btn.setAttribute('aria-label', 'Hapus dari wishlist');
-
-                        // Animasi pop
                         btn.classList.remove('love-animate');
-                        void btn.offsetWidth; // reflow
+                        void btn.offsetWidth;
                         btn.classList.add('love-animate');
                     } else {
-                        // Di-unlove
                         btn.classList.remove('loved', 'love-animate');
                         btn.setAttribute('data-loved', '0');
                         btn.setAttribute('title', 'Simpan ke wishlist');
                         btn.setAttribute('aria-label', 'Simpan ke wishlist');
                     }
-
-                    // Update badge angka di navbar
                     updateNavLoveBadge(data.total);
                 }
             })
-            .catch(err => {
-                console.error('Toggle love error:', err);
-            })
+            .catch(err => console.error('Toggle love error:', err))
             .finally(() => {
                 btn.disabled = false;
             });
     }
 
-    /**
-     * Update badge angka wishlist di navbar
-     */
     function updateNavLoveBadge(total) {
         const badge = document.querySelector('.nav-love-badge');
         if (!badge) return;

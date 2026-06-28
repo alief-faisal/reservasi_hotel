@@ -48,8 +48,8 @@ if (isset($_POST['proses_pesan'])) {
     }
 
     $id_pengguna = $_SESSION['id_pengguna'];
-    $harga_asli = $data_kamar_pilihan['harga_per_malam'];
-    $diskon = intval($data_kamar_pilihan['diskon_persen'] ?? 0);
+    $harga_asli  = $data_kamar_pilihan['harga_per_malam'];
+    $diskon      = intval($data_kamar_pilihan['diskon_persen'] ?? 0);
     $total_bayar = $diskon > 0 ? $harga_asli * (100 - $diskon) / 100 : $harga_asli;
 
     $stmt_pesan = $koneksi->prepare("INSERT INTO pemesanan (id_pengguna, id_kamar, tanggal_checkin, tanggal_checkout, total_bayar) VALUES (?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY), ?)");
@@ -65,6 +65,11 @@ if (isset($_POST['proses_pesan'])) {
     echo "<script>alert('Booking dibuat. Mengalihkan ke transaksi...'); window.location='../layanan_pembayaran/bayar.php?id_pembayaran=$id_pembayaran_baru';</script>";
     exit();
 }
+
+/* Koordinat hotel (bisa null jika belum diisi admin) */
+$hotel_lat = !empty($data_hotel['latitude'])  ? floatval($data_hotel['latitude'])  : null;
+$hotel_lng = !empty($data_hotel['longitude']) ? floatval($data_hotel['longitude']) : null;
+$punya_koordinat = ($hotel_lat !== null && $hotel_lng !== null);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -74,9 +79,13 @@ if (isset($_POST['proses_pesan'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Hotel - <?= htmlspecialchars($data_hotel['nama_hotel']); ?></title>
 
-    <!-- Keluar satu tingkat folder untuk mencari folder css/ -->
     <link rel="stylesheet" href="../css/style_navigasi.css">
     <link rel="stylesheet" href="../css/style_pesan.css">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 </head>
 
 <body>
@@ -86,13 +95,11 @@ if (isset($_POST['proses_pesan'])) {
     <main class="main-layout">
         <div class="left-column">
             <div class="block-card">
-                <?php 
+                <?php
                     $nama_foto = $data_hotel['foto'];
-                    if(empty($nama_foto) || $nama_foto == 'default.jpg' || !file_exists("../assets/" . $nama_foto)) {
-                        $path_foto = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&h=450&q=80";
-                    } else {
-                        $path_foto = "/reservasi_hotel/assets/" . $nama_foto;
-                    }
+                    $path_foto = (empty($nama_foto) || $nama_foto == 'default.jpg' || !file_exists("../assets/" . $nama_foto))
+                        ? "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&h=450&q=80"
+                        : "/reservasi_hotel/assets/" . $nama_foto;
                 ?>
                 <img src="<?= $path_foto; ?>" alt="" class="detail-img">
 
@@ -107,6 +114,35 @@ if (isset($_POST['proses_pesan'])) {
                     </div>
                     <h1 class="hotel-name"><?= htmlspecialchars($data_hotel['nama_hotel']); ?></h1>
                     <p class="hotel-desc"><?= htmlspecialchars($data_hotel['deskripsi']); ?></p>
+
+                    <!-- ===== PETA LOKASI HOTEL ===== -->
+                    <div class="hotel-map-section">
+                        <div class="hotel-map-title">
+                            Lokasi di Peta
+                        </div>
+
+                        <?php if ($punya_koordinat): ?>
+                        <div id="hotel-leaflet-map"></div>
+
+                        <!-- Tombol Google Maps -->
+                        <?php
+                        $gmaps_url = "https://www.google.com/maps/dir/?api=1&destination={$hotel_lat},{$hotel_lng}&travelmode=driving";
+                        ?>
+                        <a href="<?= $gmaps_url; ?>" target="_blank" rel="noopener noreferrer" class="btn-gmaps">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
+                            </svg>
+                            Lihat Rute
+                        </a>
+
+                        <?php else: ?>
+                        <div class="no-koordinat-notice">
+                            *Peta belum tersedia untuk hotel ini. Admin belum menambahkan koordinat lokasi.
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    <!-- ===== END PETA ===== -->
                 </div>
             </div>
         </div>
@@ -140,7 +176,7 @@ if (isset($_POST['proses_pesan'])) {
                             <?php
                             $hasil_kamar->data_seek(0);
                             while($kamar = $hasil_kamar->fetch_assoc()):
-                                $harga_kamar = $kamar['harga_per_malam'];
+                                $harga_kamar  = $kamar['harga_per_malam'];
                                 $diskon_kamar = intval($kamar['diskon_persen'] ?? 0);
                             ?>
                             <option value="<?= $kamar['id_kamar']; ?>" data-harga="<?= $harga_kamar; ?>"
@@ -186,15 +222,13 @@ if (isset($_POST['proses_pesan'])) {
             if ($hasil_rekomendasi->num_rows > 0) {
                 while($hotel_rekomendasi = $hasil_rekomendasi->fetch_assoc()) {
                     $nama_foto_rekomendasi = $hotel_rekomendasi['foto'];
-                    if(empty($nama_foto_rekomendasi) || $nama_foto_rekomendasi == 'default.jpg' || !file_exists("../assets/" . $nama_foto_rekomendasi)) {
-                        $path_foto_rekomendasi = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&h=300&q=80";
-                    } else {
-                        $path_foto_rekomendasi = "/reservasi_hotel/assets/" . $nama_foto_rekomendasi;
-                    }
+                    $path_foto_rekomendasi = (empty($nama_foto_rekomendasi) || $nama_foto_rekomendasi == 'default.jpg' || !file_exists("../assets/" . $nama_foto_rekomendasi))
+                        ? "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&h=300&q=80"
+                        : "/reservasi_hotel/assets/" . $nama_foto_rekomendasi;
 
                     $harga_original = $hotel_rekomendasi['harga_per_malam'];
-                    $diskon = intval($hotel_rekomendasi['diskon_persen'] ?? 0);
-                    $harga_final = $diskon > 0 ? $harga_original * (100 - $diskon) / 100 : $harga_original;
+                    $diskon         = intval($hotel_rekomendasi['diskon_persen'] ?? 0);
+                    $harga_final    = $diskon > 0 ? $harga_original * (100 - $diskon) / 100 : $harga_original;
             ?>
             <a href="pesan.php?id_hotel=<?= $hotel_rekomendasi['id_hotel']; ?>" class="card-link">
                 <article class="hotel-card">
@@ -207,7 +241,6 @@ if (isset($_POST['proses_pesan'])) {
                         <div class="card-meta">
                             <span><?= htmlspecialchars($hotel_rekomendasi['lokasi']); ?></span>
                         </div>
-
                         <div class="price-wrapper">
                             <span class="price-amount">
                                 <?php if ($diskon > 0): ?>
@@ -236,16 +269,11 @@ if (isset($_POST['proses_pesan'])) {
     </section>
 
     <script>
-    // Perbaikan Otomatis Struktur Navigasi saat Halaman Dimuat
     document.addEventListener('DOMContentLoaded', () => {
-        // 1. Memperbaiki link gambar logo yang pecah
         const logoImg = document.querySelector('.brand-logo img');
-        if (logoImg) {
-            logoImg.src = '/reservasi_hotel/assets/logo/logo.png';
-        }
+        if (logoImg) logoImg.src = '/reservasi_hotel/assets/logo/logo.png';
     });
 
-    // 2. Memperbaiki fungsi klik tombol Masuk & Daftar ke halaman otentikasi yang benar
     function openLoginModal(type) {
         if (type === 'login') {
             window.location.href = '../layanan_autentikasi/masuk.php';
@@ -254,7 +282,34 @@ if (isset($_POST['proses_pesan'])) {
         }
     }
 
-    // Logika Pemesanan Kamar
+    /* ===== LEAFLET MAP INISIALISASI ===== */
+    <?php if ($punya_koordinat): ?>
+    document.addEventListener('DOMContentLoaded', function() {
+        const lat = <?= $hotel_lat; ?>;
+        const lng = <?= $hotel_lng; ?>;
+        const namaHotel = <?= json_encode(htmlspecialchars($data_hotel['nama_hotel'])); ?>;
+        const lokasiHotel = <?= json_encode(htmlspecialchars($data_hotel['lokasi'])); ?>;
+
+        const map = L.map('hotel-leaflet-map').setView([lat, lng], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        const marker = L.marker([lat, lng]).addTo(map);
+        marker.bindPopup(
+            `<div style="font-family:sans-serif; min-width:140px;">
+                <strong style="font-size:0.9rem;">${namaHotel}</strong><br>
+                <span style="font-size:0.8rem; color:#64748b;"> ${lokasiHotel}</span>
+            </div>`
+        ).openPopup();
+
+        /* Perbaikan rendering jika peta berada di dalam tab/accordion tersembunyi */
+        setTimeout(() => map.invalidateSize(), 300);
+    });
+    <?php endif; ?>
+
+    /* ===== LOGIKA PEMESANAN KAMAR ===== */
     const pilihKamarSelect = document.getElementById('pilihKamar');
     const fasilitasContainer = document.getElementById('fasilitasContainer');
     const daftarFasilitas = document.getElementById('daftarFasilitas');
@@ -264,54 +319,55 @@ if (isset($_POST['proses_pesan'])) {
         return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
-    pilihKamarSelect.addEventListener('change', async function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const idKamar = this.value;
+    if (pilihKamarSelect) {
+        pilihKamarSelect.addEventListener('change', async function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const idKamar = this.value;
+            const hargaAsli = parseFloat(selectedOption.getAttribute('data-harga')) || 0;
+            const diskonPersen = parseInt(selectedOption.getAttribute('data-diskon')) || 0;
 
-        const hargaAsli = parseFloat(selectedOption.getAttribute('data-harga')) || 0;
-        const diskonPersen = parseInt(selectedOption.getAttribute('data-diskon')) || 0;
-
-        if (idKamar === '' || hargaAsli === 0) {
-            displayHarga.innerHTML =
-                `Rp - <span style="font-size: 0.85rem; color: #64748b; font-weight: 400;">/ malam</span>`;
-            fasilitasContainer.style.display = 'none';
-            daftarFasilitas.innerHTML = '';
-            return;
-        }
-
-        let hargaFinal = hargaAsli;
-        if (diskonPersen > 0) {
-            hargaFinal = hargaAsli * (100 - diskonPersen) / 100;
-            displayHarga.innerHTML = `
-                <div style="font-size: 0.85rem; color: #9ca3af; text-decoration: line-through; font-weight: 500;">${formatRupiah(hargaAsli)}</div>
-                <div>${formatRupiah(hargaFinal)} <span class="discount-badge" style="background:#fee2e2; color:#991b1b; font-size:0.7rem; padding:2px 6px; border-radius:4px; margin-left:5px;">-${diskonPersen}%</span> <span style="font-size: 0.85rem; color: #64748b; font-weight: 400;">/ malam</span></div>
-            `;
-        } else {
-            displayHarga.innerHTML =
-                `${formatRupiah(hargaFinal)} <span style="font-size: 0.85rem; color: #64748b; font-weight: 400;">/ malam</span>`;
-        }
-
-        try {
-            const response = await fetch(`get_fasilitas.php?id_kamar=${idKamar}`);
-            const fasilitas = await response.json();
-
-            if (fasilitas.length > 0) {
-                daftarFasilitas.innerHTML = fasilitas.map(item =>
-                    `<div class="fasilitas-item">
-                        <span style="color: #dc2626; font-weight: bold;">✓</span>
-                        <span>${item.nama_fasilitas}</span>
-                    </div>`
-                ).join('');
-                fasilitasContainer.style.display = 'block';
-            } else {
+            if (idKamar === '' || hargaAsli === 0) {
+                displayHarga.innerHTML =
+                    `Rp - <span style="font-size: 0.85rem; color: #64748b; font-weight: 400;">/ malam</span>`;
                 fasilitasContainer.style.display = 'none';
                 daftarFasilitas.innerHTML = '';
+                return;
             }
-        } catch (error) {
-            console.error('Error loading fasilitas:', error);
-            fasilitasContainer.style.display = 'none';
-        }
-    });
+
+            let hargaFinal = hargaAsli;
+            if (diskonPersen > 0) {
+                hargaFinal = hargaAsli * (100 - diskonPersen) / 100;
+                displayHarga.innerHTML = `
+                    <div style="font-size: 0.85rem; color: #9ca3af; text-decoration: line-through; font-weight: 500;">${formatRupiah(hargaAsli)}</div>
+                    <div>${formatRupiah(hargaFinal)} <span class="discount-badge" style="background:#fee2e2; color:#991b1b; font-size:0.7rem; padding:2px 6px; border-radius:4px; margin-left:5px;">-${diskonPersen}%</span> <span style="font-size: 0.85rem; color: #64748b; font-weight: 400;">/ malam</span></div>
+                `;
+            } else {
+                displayHarga.innerHTML =
+                    `${formatRupiah(hargaFinal)} <span style="font-size: 0.85rem; color: #64748b; font-weight: 400;">/ malam</span>`;
+            }
+
+            try {
+                const response = await fetch(`get_fasilitas.php?id_kamar=${idKamar}`);
+                const fasilitas = await response.json();
+
+                if (fasilitas.length > 0) {
+                    daftarFasilitas.innerHTML = fasilitas.map(item =>
+                        `<div class="fasilitas-item">
+                            <span style="color: #dc2626; font-weight: bold;">✓</span>
+                            <span>${item.nama_fasilitas}</span>
+                        </div>`
+                    ).join('');
+                    fasilitasContainer.style.display = 'block';
+                } else {
+                    fasilitasContainer.style.display = 'none';
+                    daftarFasilitas.innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Error loading fasilitas:', error);
+                fasilitasContainer.style.display = 'none';
+            }
+        });
+    }
     </script>
 </body>
 

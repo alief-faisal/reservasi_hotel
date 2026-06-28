@@ -48,10 +48,8 @@ $jumlah = count($daftar_love);
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
         rel="stylesheet">
 
-    <!-- CSS utama dari project -->
     <?php include '../komponen/style.php'; ?>
 
-    <!-- CSS khusus love -->
     <link rel="stylesheet" href="/reservasi_hotel/css/love.css">
 </head>
 
@@ -62,7 +60,6 @@ $jumlah = count($daftar_love);
     <main class="love-page-container">
 
         <h1 class="love-page-title">
-            <!-- Ikon hati merah -->
             Wishlist Kamu, Ayo Pesan sekarang!
         </h1>
         <p class="love-page-subtitle">
@@ -74,7 +71,6 @@ $jumlah = count($daftar_love);
         <div class="love-grid">
 
             <?php if ($jumlah === 0): ?>
-            <!-- EMPTY STATE -->
             <div class="love-empty">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -103,8 +99,16 @@ $jumlah = count($daftar_love);
                 $rating         = intval($row['rating'] ?? 0);
             ?>
 
-            <!-- CARD HOTEL WISHLIST -->
-            <div class="card-link-wrapper" style="position: relative;">
+            <div class="card-link-wrapper">
+                <button class="btn-unlove" data-hotel-id="<?= $row['id_hotel']; ?>"
+                    onclick="hapusDariWishlist(event, this, <?= $row['id_hotel']; ?>)" title="Hapus dari Wishlist">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+
                 <a href="/reservasi_hotel/layanan_pemesanan/pesan.php?id_hotel=<?= $row['id_hotel']; ?>"
                     class="card-link">
                     <article class="card-hotel">
@@ -148,13 +152,6 @@ $jumlah = count($daftar_love);
                                     </div>
                                 </span>
                             </div>
-
-                            <!-- Tombol hapus dari wishlist -->
-                            <button class="btn-unlove" data-hotel-id="<?= $row['id_hotel']; ?>"
-                                onclick="hapusDariWishlist(event, this, <?= $row['id_hotel']; ?>)">
-
-                                Hapus dari Wishlist
-                            </button>
                         </div>
                     </article>
                 </a>
@@ -168,9 +165,6 @@ $jumlah = count($daftar_love);
 
     <?php include '../komponen/modal_login.php'; ?>
     <?php include '../komponen/script.php'; ?>
-
-    <!-- CSS Love -->
-    <!-- (sudah diload di <head>) -->
 
     <script>
     // Hapus hotel dari wishlist langsung dari halaman ini

@@ -12,7 +12,7 @@
   padding: 10px 18px 10px 40px !important;
   font-size: 0.9rem !important;
   border: none !important;
-  border-radius: 9999px !important;
+  border-radius: 10px !important;
   outline: none !important;
   background-color: #f8fafc !important;
   transition:
@@ -31,9 +31,9 @@
   left: 14px !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
-  width: 16px !important;
-  height: 16px !important;
-  fill: #94a3b8 !important;
+  width: 20px !important;
+  height: 20px !important;
+  fill: #0A0036 !important;
   pointer-events: none !important;
 }
 
@@ -98,7 +98,7 @@
   display: block;
   width: 24px;
   height: 3px;
-  background-color: #0f172a;
+  background-color: #ffffff;
   border-radius: 999px;
   transition:
     transform 0.3s ease,
@@ -122,27 +122,36 @@
   font-size: 0.9rem;
 }
 
-/* mobile view */
+/* ==========================================================================
+   Mobile View (Logo Dihapus & Searchbar Melebar Maksimal)
+   ========================================================================== */
 @media (max-width: 768px) {
+  /* Mengaktifkan kembali perintah hide logo khusus di mobile sesuai request */
   .brand-logo {
     display: none !important;
   }
 
-  /* searchbar melebar otomatis mendekati hamburger (mobile view) */
+  /* Memaksa pembungkus navigasi mengambil sisa ruang kosong dari logo */
   .nav-wrapper {
+    display: flex !important;
+    align-items: center !important;
     gap: 8px !important;
     flex-grow: 1 !important;
-    margin-right: 8px !important;
+    margin-right: 12px !important; 
   }
 
+  /* Membuat form searchbar melar penuh 100% */
   .search-form-responsive {
+    display: block !important;
+    flex-grow: 1 !important;
     width: 100% !important;
     max-width: 100% !important;
     margin-left: 0 !important;
   }
 
   #searchInput {
-    padding: 8px 14px 8px 32px !important;
+    width: 100% !important;
+    padding: 10px 14px 10px 36px !important; /* Disesuaikan sedikit agar lebih proporsional */
     font-size: 0.85rem !important;
   }
 
@@ -155,12 +164,12 @@
     position: absolute;
     top: 100%;
     right: 0;
-    margin-top: 12px;
-    background-color: #ffffff;
+    margin-top: 20px;
+    background-color: #0A0036;
     box-shadow:
       0 10px 15px -3px rgba(0, 0, 0, 0.1),
       0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
+    border: 1px solid;
     border-radius: 12px;
     padding: 12px;
     flex-direction: column;
@@ -205,3 +214,4 @@
     background: #e60000 !important;
   }
 }
+

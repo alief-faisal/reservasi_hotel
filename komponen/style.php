@@ -461,12 +461,8 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 1s ease-in-out;
 }
 
-.card-hotel:hover .card-img {
-    transform: scale(1.05);
-}
 
 .card-body {
     padding: 20px;
