@@ -986,26 +986,39 @@ body {
   animation: efekOmbak 5s infinite linear;
 }
 
-/* animasi ombak card standard */
+/* animasi ombak card standard - SILVER */
 .badge-diskon-standard {
   background: linear-gradient(
     90deg,
-    #6d0000 0%, #000000 25%, #ff8585 50%, #000000 75%, #6d0000 100%
+    #4a4a4a 0%,    /* Abu-abu gelap */
+    #a6a6a6 25%,   /* Silver medium */
+    #ffffff 50%,   /* Putih kilau silver */
+    #a6a6a6 75%,   /* Silver medium */
+    #4a4a4a 100%   /* Kembali ke abu-abu gelap */
   );
-  color: #fff;
+  background-size: 200% auto;
+  color: #111;     /* Teks diganti gelap agar kontras dengan warna silver/putih */
+  font-weight: 800;
+  animation: efekOmbak 3s linear infinite; /* Memanggil animasi ombak */
 }
 
-/* animasi ombak card deluxe */
+/* animasi ombak card deluxe - EMAS */
 .badge-diskon-deluxe {
   background: linear-gradient(
     90deg,
-    #00014b 0%, #000000 25%,#0400ff 50%, #000000 75%, #00014b 100%
+    #785412 0%,    /* Emas tua/gelap */
+    #ffd700 25%,   /* Emas terang (Gold) */
+    #fff6cc 50%,   /* Putih kekuningan (Kilau emas) */
+    #ffd700 75%,   /* Emas terang */
+    #785412 100%   /* Kembali ke emas tua */
   );
-  color: #fff;
+  background-size: 200% auto;
+  color: #111;     /* Teks putih agar tetap terbaca jelas */
+    font-weight: 800;
+  animation: efekOmbak 3s linear infinite; /* Memanggil animasi ombak */
 }
 
 @keyframes efekOmbak {
-  0%,
   0% {
     background-position: 200% 0;
   }

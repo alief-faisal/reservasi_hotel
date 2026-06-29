@@ -140,7 +140,7 @@ if ($pencarian_admin !== '') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Hotel - Admin Panel</title>
 
-    <?php include '../komponen/style.php'; ?>
+    <link rel="stylesheet" href="/reservasi_hotel/css/style_index.css">
     <link rel="stylesheet" href="/reservasi_hotel/css/style_navigasi.css">
     <link rel="stylesheet" href="/reservasi_hotel/css/style_kelola_hotel.css">
 

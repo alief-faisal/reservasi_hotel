@@ -1,10 +1,16 @@
 /* ==========================================================================
    Layout Umum & Pembungkus Utama (Memastikan Scrollbar Tetap Ada)
    ========================================================================== */
-html, body {
+html {
     scroll-behavior: smooth;
-    overflow-x: hidden; /* Mencegah scroll ke samping, tapi tetap mengizinkan scroll ke bawah */
-    overflow-y: auto !important; /* Memaksa scrollbar vertikal utama tetap muncul */
+    overflow-x: hidden; /* Mencegah scroll ke samping */
+    overflow-y: scroll !important; /* MEMAKSA scrollbar kanan tetap muncul walau konten pendek */
+}
+
+body {
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 .panel-container {
@@ -12,9 +18,14 @@ html, body {
     margin: 40px auto;
     padding: 0 20px;
 }
+/* ... sisa kode CSS statistik Anda di bawahnya tetap sama ... */
 
 .panel-header {
     margin-bottom: 24px;
+}
+
+.admin-main-content {
+    margin-top: -20px; /* 👈 Menarik blok konten utama beserta isinya ke atas sebesar 15px */
 }
 
 .panel-title {

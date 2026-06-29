@@ -39,8 +39,6 @@ $payment_methods = [
     'gopay' => ['nama' => 'GoPay', 'ikon' => '../assets/icons/gopay_logo.png', 'biaya' => 0, 'is_image' => true],
     'ovo' => ['nama' => 'OVO', 'ikon' => '../assets/icons/ovo_logo.png', 'biaya' => 0, 'is_image' => true],
     'dana' => ['nama' => 'DANA', 'ikon' => '../assets/icons/dana_logo.png', 'biaya' => 0, 'is_image' => true],
-    'transfer_bank' => ['nama' => 'Transfer Bank', 'ikon' => '🏦', 'biaya' => 0, 'is_image' => false],
-    'kartu_kredit' => ['nama' => 'Kartu Kredit/Debit', 'ikon' => '💳', 'biaya' => 0, 'is_image' => false],
 ];
 ?>
 <!DOCTYPE html>

@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Open Sans', sans-serif;
 }
 
 body {
@@ -54,7 +54,7 @@ body {
 
 .invoice-id {
     background: #f0f4ff;
-    color: #667eea;
+    color: #000000;
     padding: 8px 16px;
     border-radius: 6px;
     font-size: 0.85rem;
@@ -91,7 +91,7 @@ body {
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #2563eb;
 }
 
 .hotel-name {
@@ -127,7 +127,7 @@ body {
     padding-top: 10px;
     font-size: 1.2rem;
     font-weight: 700;
-    color: #667eea;
+    color: #000000;
 }
 
 /* bagian metode pembayaran */
@@ -165,7 +165,6 @@ body {
 }
 
 .payment-method:hover {
-    border-color: #667eea;
     background: #f8fafc;
 }
 
@@ -174,7 +173,7 @@ body {
     height: 20px;
     cursor: pointer;
     margin-right: 15px;
-    accent-color: #667eea;
+    accent-color: #2563eb;
 }
 
 .method-content {
@@ -216,7 +215,7 @@ body {
 .method-time {
     font-size: 0.85rem;
     background: #f0f4ff;
-    color: #667eea;
+    color: #2563eb;
     padding: 6px 12px;
     border-radius: 20px;
     font-weight: 600;
@@ -237,7 +236,7 @@ body {
 .btn-pay {
     width: 100%;
     padding: 16px;
-    background: #3b82f6;
+    background: #2563eb;
     color: white;
     border: none;
     border-radius: 8px;
@@ -245,13 +244,11 @@ body {
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .btn-pay:hover {
     background: #2563eb;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
 .btn-pay:disabled {

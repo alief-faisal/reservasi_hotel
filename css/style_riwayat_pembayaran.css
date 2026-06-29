@@ -154,7 +154,7 @@ body {
 .price-amount {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #667eea;
+    color: #2563eb;
 }
 
 .action-buttons {
@@ -178,18 +178,18 @@ body {
 }
 
 .btn-receipt {
-    background: #667eea;
+    background: #2563eb;
     color: white;
 }
 
 .btn-receipt:hover {
-    background: #5568d3;
+    background: #2563eb;
 }
 
 .btn-pay {
     background: #f0f4ff;
-    color: #667eea;
-    border: 2px solid #667eea;
+    color: #2563eb;
+    border: 2px solid #2563eb;
 }
 
 .btn-pay:hover {
@@ -221,7 +221,7 @@ body {
 
 .btn-home {
     display: inline-block;
-    background: #667eea;
+    background: #2563eb;
     color: white;
     padding: 10px 24px;
     border-radius: 6px;
@@ -231,7 +231,7 @@ body {
 }
 
 .btn-home:hover {
-    background: #5568d3;
+    background: #2563eb;
 }
 
 .payment-ref {

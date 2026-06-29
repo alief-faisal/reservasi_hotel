@@ -28,8 +28,6 @@ $metode_pembayaran = [
     'gopay' => 'GoPay',
     'ovo' => 'OVO',
     'dana' => 'DANA',
-    'transfer_bank' => 'Transfer Bank',
-    'kartu_kredit' => 'Kartu Kredit'
 ];
 
 $nama_metode = $metode_pembayaran[$data['metode_pembayaran']] ?? $data['metode_pembayaran'];

@@ -31,8 +31,8 @@ $pesanan_counts = json_encode(array_map(fn($i) => $i['jumlah_pesanan'], $stats_d
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistik Penjualan - Admin</title>
 
-    <!--  memanggil css global, navigasi, dan modul statistik -->
-    <?php include '../komponen/style.php'; ?>
+    <!-- memanggil css global, navigasi, dan modul statistik -->
+    <link rel="stylesheet" href="/reservasi_hotel/css/style_index.css">
     <link rel="stylesheet" href="/reservasi_hotel/css/style_navigasi.css">
     <link rel="stylesheet" href="/reservasi_hotel/css/style_statistik.css">
 
