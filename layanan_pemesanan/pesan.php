@@ -206,7 +206,7 @@ $punya_koordinat = ($hotel_lat !== null && $hotel_lng !== null);
                     </div>
 
                     <div class="fasilitas-section" id="fasilitasContainer" style="display: none; margin-bottom: 25px;">
-                        <div class="fasilitas-title">Fasilitas Kamar Ini:</div>
+                        <div class="fasilitas-title">Fasilitas Kamar :</div>
                         <div class="fasilitas-list" id="daftarFasilitas"></div>
                     </div>
 
@@ -256,18 +256,19 @@ $punya_koordinat = ($hotel_lat !== null && $hotel_lng !== null);
                     <div class="card-body">
                         <h3 class="card-title"><?= htmlspecialchars($hotel_rekomendasi['nama_hotel']); ?></h3>
 
-                      <?php $rating_rek = intval($hotel_rekomendasi['rating'] ?? 0); ?>
-    <?php if ($rating_rek > 0): ?>
-    <div class="card-rating" style="margin-bottom: 8px;">
-        <div class="rating-stars">
-            <?php for ($j = 1; $j <= $rating_rek; $j++): ?>
-            <svg class="star-icon" viewBox="0 0 24 24" style="width:14px;height:14px;fill:#f97316;">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-            <?php endfor; ?>
-        </div>
-    </div>
-    <?php endif; ?>  <div class="card-meta">
+                        <?php $rating_rek = intval($hotel_rekomendasi['rating'] ?? 0); ?>
+                        <?php if ($rating_rek > 0): ?>
+                        <div class="card-rating" style="margin-bottom: 8px;">
+                            <div class="rating-stars">
+                                <?php for ($j = 1; $j <= $rating_rek; $j++): ?>
+                                <svg class="star-icon" viewBox="0 0 24 24" style="width:14px;height:14px;fill:#f97316;">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                </svg>
+                                <?php endfor; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?> <div class="card-meta">
                             <span><?= htmlspecialchars($hotel_rekomendasi['lokasi']); ?></span>
                         </div>
                         <div class="price-wrapper">

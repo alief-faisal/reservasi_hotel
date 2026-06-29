@@ -165,11 +165,10 @@ function getBadgeDiskon(array $row): array|false {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
         rel="stylesheet">
-    <!-- Paksa browser selalu reload, tidak boleh cache halaman ini -->
+    <!-- paksa browser selalu reload -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <!-- CSS utama index (dipindah dari style.php) -->
     <link rel="stylesheet" href="/reservasi_hotel/css/style_index.css">
     <link rel="stylesheet" href="/reservasi_hotel/css/love.css">
 </head>
@@ -195,15 +194,13 @@ function getBadgeDiskon(array $row): array|false {
 
         <section class="flex-hotel" style="display: block !important;">
 
-            <!-- ============================================================
-                 SKELETON CONTAINER
-                 ============================================================ -->
+            <!-- skeleton container -->
             <div id="skeleton-container" style="width:100% !important; display:block !important;">
 
                 <?php if (!$ada_filter_aktif): ?>
-                <!-- ── 1. SKELETON GRID CARD BIASA (4 kolom) — hanya saat tanpa filter ── -->
+                <!-- skeleton card baris pertama -->
                 <div class="grid-4-kolom">
-                    <?php for ($i = 0; $i < 8; $i++): ?>
+                    <?php for ($i = 0; $i < 4; $i++): ?>
                     <div class="card-hotel" style="box-shadow:none; overflow:hidden;">
                         <div class="sk-card-img shimmer"></div>
                         <div class="sk-badge-strip shimmer"></div>
@@ -218,7 +215,7 @@ function getBadgeDiskon(array $row): array|false {
                     <?php endfor; ?>
                 </div>
 
-                <!-- ── 2. SKELETON SECTION DISKON (latar biru) — hanya saat tanpa filter ── -->
+                <!-- skeleton card baris kedua -->
                 <div class="container-diskon-tengah">
                     <section class="section-diskon-besar">
                         <div class="shimmer-dark"
@@ -249,7 +246,7 @@ function getBadgeDiskon(array $row): array|false {
                 </div>
                 <?php endif; ?>
 
-                <!-- ── 3. SKELETON CARD LIST HORIZONTAL — selalu muncul ── -->
+                <!-- skeleton card baris ketiga -->
                 <?php if ($keyword !== ''): ?>
                 <div class="shimmer" style="height:22px; width:200px; margin-bottom:16px; border-radius:4px;"></div>
                 <?php elseif ($lokasi_filter !== ''): ?>
@@ -262,7 +259,7 @@ function getBadgeDiskon(array $row): array|false {
 
                 <div style="display:flex; flex-direction:column; gap:20px; margin-bottom:30px;">
                     <?php
-        // Jumlah skeleton card list menyesuaikan — filter tampilkan lebih banyak
+        // Jumlah skeleton card list 
         $sk_count = $ada_filter_aktif ? 5 : 3;
         for ($i = 0; $i < $sk_count; $i++):
         ?>
@@ -285,19 +282,15 @@ function getBadgeDiskon(array $row): array|false {
                     </div>
                     <?php endfor; ?>
                 </div>
-
             </div>
-            <!-- ── END SKELETON CONTAINER ── -->
 
 
-            <!-- ============================================================
-                 KONTEN ASLI
-                 ============================================================ -->
+            <!-- konten homepage -->
             <div id="actual-content" style="width:100% !important; display:block !important;">
                 <?php if ($jumlah_hotel_biasa > 0 || $jumlah_hotel_diskon > 0): ?>
 
                 <?php if (!$ada_filter_aktif): ?>
-                <!-- ── BARIS 1: GRID CARD BIASA (maks 4) — hanya muncul saat TANPA filter ── -->
+                <!-- card baris pertama -->
                 <div class="grid-4-kolom">
                     <?php
                     $counter = 0;
@@ -398,7 +391,7 @@ function getBadgeDiskon(array $row): array|false {
                     ?>
                 </div>
 
-                <!-- ── BARIS 2: SECTION DISKON (slider biru) — hanya muncul saat TANPA filter ── -->
+                <!-- card baris kedua -->
                 <?php if ($jumlah_hotel_diskon > 0): ?>
                 <div class="container-diskon-tengah">
                     <section class="section-diskon-besar">
@@ -512,10 +505,7 @@ function getBadgeDiskon(array $row): array|false {
                 <?php endif; ?>
                 <?php endif; // tutup if (!$ada_filter_aktif) ?>
 
-                <!-- ── BARIS 3: CARD LIST HORIZONTAL (per lokasi) ──
-                     Tanpa filter   : mulai dari index 4 (sisa setelah grid 4 kolom)
-                     Dengan filter  : mulai dari index 0 (SEMUA hotel tampil di sini)
-                ── -->
+                <!-- card baris ketiga -->
                 <?php
                 $index_mulai = $ada_filter_aktif ? 0 : 4;
                 if ($jumlah_hotel_biasa > $index_mulai):
@@ -555,7 +545,7 @@ function getBadgeDiskon(array $row): array|false {
                 <a href="/reservasi_hotel/layanan_pemesanan/pesan.php?id_hotel=<?= $row['id_hotel']; ?>"
                     class="card-hotel-list">
 
-                    <!-- KIRI: GAMBAR -->
+                    <!-- image card -->
                     <div class="list-img-section">
                         <?php if ($is_terlaris): ?>
                         <div class="favorite-badge">Terlaris</div>
@@ -608,7 +598,7 @@ function getBadgeDiskon(array $row): array|false {
                             <div class="room-header-top">
                                 <span class="room-type-title title-standard">Kamar Standard</span>
                                 <?php if ($h_standard > 0 && $d_standard > 0): ?>
-                                <span class="discount-badge">-<?= $d_standard; ?>%</span>
+                                <span class="discount-badge"><?= $d_standard; ?>%</span>
                                 <?php endif; ?>
                             </div>
                             <?php if ($h_standard > 0): ?>

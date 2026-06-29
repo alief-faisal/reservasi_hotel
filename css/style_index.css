@@ -495,7 +495,7 @@ body {
   flex-shrink: 0;
 }
 
-/* Rating bintang */
+/* bintang hotel */
 .card-rating {
   display: flex;
   align-items: center;
@@ -529,10 +529,7 @@ body {
   min-height: 2.8rem;
 }
 
-/* =============================================
-   BADGE JARAK — posisi di bawah harga (card grid)
-   dan di samping lokasi (card list)
-   ============================================= */
+/* badge jarak */
 .badge-jarak {
   display: inline-flex;
   align-items: center;
@@ -546,7 +543,7 @@ body {
   letter-spacing: 0.02em;
   white-space: nowrap;
   flex-shrink: 0;
-  margin-top: 6px; /* jarak dari harga di card grid */
+  margin-top: 6px;
   align-self: flex-start;
 }
 
@@ -557,7 +554,7 @@ body {
   flex-shrink: 0;
 }
 
-/* Bagian harga di bawah card */
+/* bagian harga di bawah card */
 .price-wrapper {
   margin-top: auto;
   display: flex;
@@ -587,7 +584,7 @@ body {
   margin-left: 2px;
 }
 
-/* Harga asli dengan garis coret merah */
+/* harga asli */
 .price-original {
   font-size: 0.8rem;
   color: #9ca3af;
@@ -597,7 +594,7 @@ body {
   display: inline-block;
 }
 
-/* Badge diskon (pill kecil merah muda) */
+/* badge diskon */
 .discount-badge {
   display: inline-block;
   background: #fee2e2;
@@ -608,15 +605,7 @@ body {
   border-radius: 3px;
 }
 
-/* =============================================
-   BADGE "TERLARIS" — ribbon segitiga pojok kiri atas
-   Menempel ke sisi kiri & atas card,
-   rounded hanya di sudut kanan bawah (seperti gambar referensi)
-   ============================================= */
-/* =============================================
-   BADGE "TERLARIS" — pita gradasi kuning-oranye
-   dengan efek 3D timbul (shadow + sedikit rotate)
-   ============================================= */
+/* BADGE TERLARIS */
 .favorite-badge {
   position: absolute;
   top: 0;
@@ -628,7 +617,7 @@ body {
   letter-spacing: 0.2px;
   color: #fff;
   background: linear-gradient(135deg, #ffe066 0%, #f8a100 55%, #ff7a00 100%);
-  border-radius: 0 0 16px 0; /* hanya sudut kanan bawah */
+  border-radius: 0 0 16px 0;
   box-shadow:
     2px 2px 8px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
@@ -643,9 +632,7 @@ body {
   display: none;
 }
 
-/* =============================================
-   SKELETON LOADING (SHIMMER)
-   ============================================= */
+/* SKELETON LOADING SHIMMER */
 @keyframes efekShimmer {
   0% {
     background-position: -200% 0;
@@ -656,7 +643,7 @@ body {
   }
 }
 
-/* Kelas shimmer universal — tempel ke elemen apapun */
+/* kelas shimmer universal */
 .shimmer {
   background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
   background-size: 200% 100%;
@@ -671,11 +658,9 @@ body {
   margin-bottom: 12px;
 }
 
-/* -----------------------------------------------
-   SKELETON CARD GRID (baris 1 & 2 — 4 kolom)
-   ----------------------------------------------- */
+/* SKELETON CARD GRID */
 
-/* Gambar skeleton card grid */
+/* gambar skeleton card grid */
 .sk-card-img {
   width: 100%;
   height: 180px;
@@ -683,7 +668,7 @@ body {
   flex-shrink: 0;
 }
 
-/* Badge diskon skeleton (strip bawah gambar) */
+/* badge diskon skeleton (strip bawah gambar) */
 .sk-badge-strip {
   height: 24px;
   width: 100%;
@@ -693,7 +678,7 @@ body {
   z-index: 2;
 }
 
-/* Body skeleton card grid */
+/* body skeleton card grid */
 .sk-card-body {
   padding: 16px;
   display: flex;
@@ -702,44 +687,42 @@ body {
   gap: 0;
 }
 
-/* Judul hotel */
+/* judul hotel */
 .sk-title {
   height: 20px;
   width: 80%;
   margin-bottom: 10px;
 }
 
-/* Bintang rating */
+/* bintang hotel */
 .sk-stars {
   height: 14px;
   width: 55%;
   margin-bottom: 10px;
 }
 
-/* Lokasi */
+/* lokasi */
 .sk-location {
   height: 12px;
   width: 45%;
   margin-bottom: 16px;
 }
 
-/* Harga coret (opsional, muncul di card diskon) */
+/* harga coret */
 .sk-price-old {
   height: 12px;
   width: 50%;
   margin-bottom: 6px;
 }
 
-/* Harga final */
+/* harga final */
 .sk-price {
   height: 22px;
   width: 70%;
   margin-top: auto;
 }
 
-/* -----------------------------------------------
-   SKELETON SECTION DISKON (latar biru)
-   ----------------------------------------------- */
+/* halaman skeleton card diskon */
 .shimmer-dark {
   background: linear-gradient(
     90deg,
@@ -752,9 +735,7 @@ body {
   border-radius: 4px;
 }
 
-/* -----------------------------------------------
-   SKELETON CARD LIST HORIZONTAL (baris 3)
-   ----------------------------------------------- */
+/* halaman skeleton card baris ketiga horizontal */
 .sk-list-card {
   display: flex;
   flex-direction: row;
@@ -765,7 +746,7 @@ body {
   height: 160px;
 }
 
-/* Bagian kiri gambar */
+/* bagian kiri gambar */
 .sk-list-img {
   width: 30%;
   min-width: 240px;
@@ -774,7 +755,7 @@ body {
   border-radius: 0;
 }
 
-/* Bagian tengah teks */
+/* bagian tengah teks */
 .sk-list-center {
   flex: 1;
   padding: 20px;
@@ -799,7 +780,7 @@ body {
   width: 50%;
 }
 
-/* Bagian kanan harga */
+/* bagian kanan harga */
 .sk-list-right {
   width: 35%;
   padding: 20px;
@@ -836,7 +817,7 @@ body {
   margin: 4px 0;
 }
 
-/* Tampilan kosong jika tidak ada data */
+/* tampilan kosong jika tidak ada data */
 .empty-state {
   text-align: center;
   padding: 60px;
@@ -848,27 +829,18 @@ body {
   grid-column: span 4;
 }
 
-/* =============================================
-   SECTION DISKON (BACKGROUND BIRU GELAP)
-   ============================================= */
+/* halaman background diskon */
 .section-diskon-besar {
   margin: 40px 0;
-  /* Tambahkan properti untuk animasi slow blend */
-  background: linear-gradient(
-    135deg,
-    #002a61 0%,
-    #152bf5 100%,
-    #1a1a2e 0%
-  ); /* Ditambah satu warna untuk blend */
-  background-size: 200% 200%; /* Membesarkan background untuk animasi gradien */
+  /* properti untuk animasi slow blend */
+  background: linear-gradient(135deg, #1b0091 0%, #152bf5 100%, #1a1a2e 0%);
+  background-size: 200% 200%;
   padding: 40px;
   border-radius: 12px;
-  animation: slowBlend 10s ease infinite; /* Animasi berjalan perlahan (10s), looping selamanya */
+  animation: slowBlend 10s ease infinite; /* animasi berjalan perlahan (10d), looping */
 }
 
-/* =============================================
-   ANIMASI SLOW BLEND (WARNA BERGERAK)
-   ============================================= */
+/* animasi background halaman diskon  */
 @keyframes slowBlend {
   0% {
     background-position: 0% 50%;
@@ -889,7 +861,7 @@ body {
   letter-spacing: -0.5px;
 }
 
-/* Grid diskon statis (tanpa slider) */
+/* grid diskon statis */
 .grid-diskon {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -897,9 +869,7 @@ body {
   width: 100%;
 }
 
-/* =============================================
-   SLIDER DISKON (HORIZONTAL SCROLL + CHEVRON)
-   ============================================= */
+/* halaman card diskon */
 .slider-diskon-wrapper {
   position: relative;
   width: 100%;
@@ -908,7 +878,7 @@ body {
   cursor: grab;
 }
 
-/* Scrollable flex row, scrollbar disembunyikan */
+/* card diskon scrollable flex row, scrollbar disembunyikan */
 .grid-diskon-slider {
   display: flex !important;
   gap: 20px;
@@ -924,14 +894,14 @@ body {
   display: none;
 }
 
-/* Setiap kartu di slider tepat 1/4 lebar (4 kartu terlihat) */
+/* card diskon slider */
 .grid-diskon-slider .card-link {
   flex: 0 0 calc((100% - (3 * 20px)) / 4) !important;
   min-width: calc((100% - (3 * 20px)) / 4) !important;
   box-sizing: border-box;
 }
 
-/* Tombol chevron kiri/kanan untuk navigasi slider desktop */
+/* tombol chevron kiri/kanan untuk navigasi slider desktop */
 .chevron-btn {
   position: absolute;
   top: 50%;
@@ -986,42 +956,41 @@ body {
   animation: efekOmbak 5s infinite linear;
 }
 
-/* animasi ombak card standard - SILVER */
+/* animasi ombak card standard  */
 .badge-diskon-standard {
   background: linear-gradient(
     90deg,
-    #4a4a4a 0%,    /* Abu-abu gelap */
-    #a6a6a6 25%,   /* Silver medium */
-    #ffffff 50%,   /* Putih kilau silver */
-    #a6a6a6 75%,   /* Silver medium */
-    #4a4a4a 100%   /* Kembali ke abu-abu gelap */
+    #6d0000 0%,
+    #000000 25%,
+    #ff8585 50%,
+    #000000 75%,
+    #6d0000 100%
   );
-  background-size: 200% auto;
-  color: #111;     /* Teks diganti gelap agar kontras dengan warna silver/putih */
-  font-weight: 800;
-  animation: efekOmbak 3s linear infinite; /* Memanggil animasi ombak */
+
+  color: #fff;
 }
 
-/* animasi ombak card deluxe - EMAS */
+/* animasi ombak card deluxe */
+
 .badge-diskon-deluxe {
   background: linear-gradient(
     90deg,
-    #785412 0%,    /* Emas tua/gelap */
-    #ffd700 25%,   /* Emas terang (Gold) */
-    #fff6cc 50%,   /* Putih kekuningan (Kilau emas) */
-    #ffd700 75%,   /* Emas terang */
-    #785412 100%   /* Kembali ke emas tua */
+    #00014b 0%,
+    #000000 25%,
+    #0400ff 50%,
+    #000000 75%,
+    #00014b 100%
   );
-  background-size: 200% auto;
-  color: #111;     /* Teks putih agar tetap terbaca jelas */
-    font-weight: 800;
-  animation: efekOmbak 3s linear infinite; /* Memanggil animasi ombak */
+
+  color: #fff;
 }
 
 @keyframes efekOmbak {
+  0%,
   0% {
     background-position: 200% 0;
   }
+
   100% {
     background-position: 0% 0;
   }

@@ -140,7 +140,7 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
                             <path
                                 d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
                         </svg>
-                        Gunakan Lokasi Saya
+                        Lokasi Perangkat
                     </button>
 
                     <div class="lokasi-divider-item"></div>
@@ -188,13 +188,27 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
                 <!-- ===== DESKTOP: Nama → Dropdown Menu ===== -->
                 <div class="user-dropdown-wrapper" id="userDropdownWrapper">
                     <button type="button" class="btn-user-nama" id="btnUserNama">
+                        <!-- Icon SVG User Baru -->
+                        <svg class="icon-user" viewBox="0 0 24 24"
+                            style="width: 20px; height: 20px; vertical-align: middle; fill: currentColor; margin-right: 8px;">
+                            <path
+                                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                        </svg>
                         <?= $nama_user; ?>
                         <svg class="chevron-user" viewBox="0 0 24 24">
                             <path d="M7 10l5 5 5-5z" />
                         </svg>
                     </button>
                     <div class="user-dropdown-menu" id="userDropdownMenu">
-                        <div class="user-dropdown-header"><?= $nama_user; ?></div>
+                        <div class="user-dropdown-header">
+                            <!-- Icon SVG User Baru di Header Dropdown -->
+                            <svg class="icon-user-header" viewBox="0 0 24 24"
+                                style="width: 18px; height: 18px; vertical-align: middle; fill: currentColor; margin-right: 8px;">
+                                <path
+                                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                            </svg>
+                            <?= $nama_user; ?>
+                        </div>
                         <a href="/reservasi_hotel/layanan_pembayaran/riwayat_pembayaran.php">
                             <svg viewBox="0 0 24 24">
                                 <path
@@ -264,20 +278,16 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
      MOBILE HAMBURGER MENU PANEL (terpisah, di luar header flow)
      ============================================================ -->
 <div id="mobileMenuPanel"
-    style="display:none; position:fixed; top:72px; right:16px; background:#0A0036; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:12px; min-width:220px; z-index:1050; box-shadow:0 10px 30px rgba(0,0,0,0.25); flex-direction:column; gap:4px;">
+    style="display:none; position:fixed; top:80px; right:16px; background:#FFFFFF; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:12px; min-width:220px; z-index:1050; box-shadow:0 10px 30px rgba(0,0,0,0.25); flex-direction:column; gap:4px;">
     <?php if (isset($_SESSION['peran'])): ?>
 
     <?php if (!$is_admin): ?>
     <div
-        style="color:#94a3b8; font-size:0.78rem; padding:4px 12px 6px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:4px;">
+        style="color:#1e293b; font-size:0.9rem; font-weight: 600; padding:4px 12px 6px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:4px;">
         <?= $nama_user; ?>
     </div>
 
     <a href="/reservasi_hotel/layanan_wishlist/halaman_love.php" class="mobile-wishlist-row">
-        <svg class="mobile-wishlist-icon <?= $jumlah_wishlist > 0 ? 'filled-mobile' : ''; ?>" viewBox="0 0 24 24">
-            <path
-                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-        </svg>
         <span class="mobile-wishlist-label">Wishlist</span>
         <?php if ($jumlah_wishlist > 0): ?>
         <span class="mobile-wishlist-badge" id="mobileLoveBadge"><?= $jumlah_wishlist; ?></span>
@@ -287,9 +297,6 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
     </a>
 
     <a href="/reservasi_hotel/layanan_pembayaran/riwayat_pembayaran.php" class="mobile-riwayat-link">
-        <svg style="width:16px;height:16px;fill:#94a3b8;flex-shrink:0;" viewBox="0 0 24 24">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
-        </svg>
         Riwayat Pembayaran
     </a>
 
@@ -298,13 +305,18 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
 
     <?php else: ?>
     <a href="/reservasi_hotel/layanan_hotel/kelola_hotel.php" class="mobile-riwayat-link">Admin Panel</a>
+    <!-- Divider atas tetap dipertahankan jika memang butuh batas dengan menu di atasnya -->
     <div class="mobile-menu-divider"></div>
+
+    <a href="/reservasi_hotel" class="mobile-beranda-btn">Beranda</a>
+    <!-- Divider di tengah ini DIHAPUS -->
     <a href="/reservasi_hotel/layanan_autentikasi/keluar.php" class="mobile-keluar-btn">Keluar</a>
+
     <?php endif; ?>
 
     <?php else: ?>
     <button type="button" onclick="openLoginModal('login'); closeMobileMenu();"
-        style="background:none;border:none;color:#fff;font-weight:600;font-size:0.9rem;padding:8px 12px;text-align:left;cursor:pointer;font-family:inherit;border-radius:6px;width:100%;">
+        style="background:none;border:none;color:#1e293b; font-weight:600;font-size:0.9rem;padding:8px 12px;text-align:left;cursor:pointer;font-family:inherit;border-radius:6px;width:100%;">
         Masuk
     </button>
     <button type="button" onclick="openLoginModal('daftar'); closeMobileMenu();"

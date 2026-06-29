@@ -280,6 +280,7 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
     min-width: 210px;
     padding: 8px 0;
+    margin-top: 20px;
     z-index: 9999;
 }
 
@@ -291,8 +292,8 @@
 /* Header nama di dalam dropdown */
 .user-dropdown-header {
     padding: 10px 16px 8px;
-    font-size: 0.8rem;
-    color: #94a3b8;
+    font-size: 0.88rem;
+    color: #1e293b;
     font-weight: 500;
     border-bottom: 1px solid #f1f5f9;
     margin-bottom: 4px;
@@ -500,7 +501,7 @@
     flex: 1;
     font-size: 0.9rem;
     font-weight: 600;
-    color: #FFFFFF;
+    color: #1e293b;
 }
 
 /* =============================================
@@ -595,13 +596,29 @@
         align-items: center;
         gap: 10px;
         padding: 8px 12px !important;
-        color: #FFFFFF !important;
+        color: #1e293b !important;
         text-decoration: none;
         font-size: 0.9rem;
         font-weight: 600;
         border-radius: 6px;
         width: 100%;
         box-sizing: border-box;
+    }
+        .mobile-beranda-btn {
+        display: block !important;
+        width: 100%;
+        text-align: center !important;
+        background: #2563eb !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-family: inherit;
+        margin-top: 4px;
+        text-decoration: none;
     }
 
     .mobile-keluar-btn {
