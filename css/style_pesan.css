@@ -290,7 +290,21 @@ body {
 .price-original {
     font-size: 0.8rem;
     color: #9ca3af;
-    text-decoration: line-through;
+    text-decoration: none;
+    position: relative;
+    display: inline-block;
+}
+
+.price-original::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    background-color: #ef4444;
+    transform: rotate(-3deg);
+    transform-origin: center;
 }
 
 .discount-badge {

@@ -148,86 +148,10 @@ if ($pencarian_admin !== '') {
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <style>
-    /* ===== KOORDINAT INPUT ===== */
-    .koordinat-group {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 14px;
-        margin-bottom: 16px;
-    }
-
-    .koordinat-group label.koord-title {
-        display: block;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 10px;
-        font-size: 0.9rem;
-    }
-
-    .koordinat-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-
-    .koordinat-row input {
-        padding: 9px 10px;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .btn-preview-map {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: #2563eb;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        padding: 7px 14px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        cursor: pointer;
-        margin-bottom: 10px;
-        transition: background 0.2s;
-    }
-
-    .btn-preview-map:hover {
-        background: #1d4ed8;
-    }
-
-    #preview-map-container {
-        display: none;
-        height: 200px;
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1px solid #cbd5e1;
-        margin-top: 8px;
-    }
-
-    #preview-map {
-        height: 100%;
-    }
-
-    .koord-hint {
-        font-size: 0.72rem;
-        color: #94a3b8;
-        margin-top: 6px;
-    }
-
-    /* Koordinat di tabel */
-    .coord-cell {
-        font-size: 0.75rem;
-        color: #64748b;
-        font-family: monospace;
-    }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
@@ -306,7 +230,7 @@ if ($pencarian_admin !== '') {
 
                             <!-- ===== KOORDINAT LOKASI ===== -->
                             <div class="koordinat-group">
-                                <label class="koord-title">📍 Koordinat Lokasi (untuk peta)</label>
+                                <label class="koord-title">Koordinat Lokasi (untuk peta)</label>
                                 <div class="koordinat-row">
                                     <div>
                                         <label

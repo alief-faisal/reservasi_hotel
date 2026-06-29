@@ -10,7 +10,23 @@ $koneksi = new mysqli("localhost", "root", "", "reservasi_hotel");
 /* search bar/pencarian */
 $keyword = isset($_GET['cari']) ? $koneksi->real_escape_string($_GET['cari']) : '';
 
-/* Ambil Semua Data Beserta Info Diskon Per Tipe Kamar */
+/* filter lokasi dari dropdown navigasi */
+$lokasi_filter = isset($_GET['lokasi']) ? $koneksi->real_escape_string($_GET['lokasi']) : '';
+
+/* koordinat GPS untuk sorting terdekat */
+$user_lat = isset($_GET['latitude']) ? floatval($_GET['latitude']) : null;
+$user_lng = isset($_GET['longitude']) ? floatval($_GET['longitude']) : null;
+$mode_terdekat = ($user_lat !== null && $user_lng !== null);
+
+/* Kalau ada filter aktif (pencarian / lokasi / mode terdekat),
+   tampilan cukup pakai card list horizontal saja (baris 3),
+   tanpa grid 4 kolom & tanpa section diskon biru di atasnya. */
+$ada_filter_aktif = ($keyword !== '' || $lokasi_filter !== '' || $mode_terdekat);
+
+/* ============================================================
+   Ambil Semua Data Beserta Info Diskon Per Tipe Kamar
+   Pastikan kolom lat, lng ikut diambil dari tabel hotel
+   ============================================================ */
 $query = "SELECT h.*,
             MAX(CASE WHEN k.tipe_kamar = 'Standard' THEN k.harga_per_malam END) AS harga_standard,
             MAX(CASE WHEN k.tipe_kamar = 'Standard' THEN k.diskon_persen END) AS diskon_standard,
@@ -20,8 +36,16 @@ $query = "SELECT h.*,
             MAX(k.diskon_persen)   AS diskon_persen
           FROM hotel h
           LEFT JOIN kamar k ON h.id_hotel = k.id_hotel";
+
+$where_clauses = [];
 if ($keyword !== '') {
-    $query .= " WHERE h.nama_hotel LIKE '%$keyword%' OR h.lokasi LIKE '%$keyword%'";
+    $where_clauses[] = "(h.nama_hotel LIKE '%$keyword%' OR h.lokasi LIKE '%$keyword%')";
+}
+if ($lokasi_filter !== '') {
+    $where_clauses[] = "h.lokasi = '$lokasi_filter'";
+}
+if (!empty($where_clauses)) {
+    $query .= " WHERE " . implode(' AND ', $where_clauses);
 }
 $query .= " GROUP BY h.id_hotel ORDER BY h.lokasi ASC, RAND()";
 $hasil_raw = $koneksi->query($query);
@@ -31,8 +55,23 @@ $hotel_diskon = [];
 
 if ($hasil_raw && $hasil_raw->num_rows > 0) {
     while ($row = $hasil_raw->fetch_assoc()) {
+        /* Hitung jarak jika mode GPS aktif */
+        if ($mode_terdekat
+    && isset($row['latitude']) && isset($row['longitude'])
+    && $row['latitude'] !== null && $row['longitude'] !== null
+    && $row['latitude'] !== '' && $row['longitude'] !== '') {
+            $row['_jarak_km'] = hitungJarak($user_lat, $user_lng, floatval($row['latitude']), floatval($row['longitude']));
+        } else {
+            $row['_jarak_km'] = null;
+        }
+
         $diskon = intval($row['diskon_persen'] ?? 0);
-        if ($diskon >= 50 && $keyword === '') {
+        /* 
+         * Hotel diskon >= 50% hanya masuk seksi biru jika TIDAK ada filter aktif.
+         * Jika ada keyword/lokasi filter, semua hotel tampil di baris biasa agar
+         * card list horizontal juga muncul.
+         */
+        if ($diskon >= 50 && !$ada_filter_aktif) {
             $hotel_diskon[] = $row;
         } else {
             $hotel_biasa[] = $row;
@@ -40,23 +79,36 @@ if ($hasil_raw && $hasil_raw->num_rows > 0) {
     }
 }
 
+/* Jika mode terdekat, urutkan hotel_biasa berdasarkan jarak */
+if ($mode_terdekat) {
+    usort($hotel_biasa, function($a, $b) {
+        $ja = $a['_jarak_km'] ?? PHP_FLOAT_MAX;
+        $jb = $b['_jarak_km'] ?? PHP_FLOAT_MAX;
+        return $ja <=> $jb;
+    });
+}
+
 $jumlah_hotel_biasa  = count($hotel_biasa);
 $jumlah_hotel_diskon = count($hotel_diskon);
 
-/* logika hotel dengan pesanan terbanyak hari ini */
+/* ============================================================
+   Logika 3 hotel dengan pesanan terbanyak hari ini
+   ============================================================ */
 $query_favorit = "SELECT h.id_hotel, COUNT(DISTINCT b.id_pemesanan) as jumlah_pesanan
                   FROM hotel h
                   LEFT JOIN kamar k ON h.id_hotel = k.id_hotel
                   LEFT JOIN pemesanan b ON k.id_kamar = b.id_kamar
                   WHERE DATE(b.dibuat_pada) = CURDATE()
                   GROUP BY h.id_hotel
+                  HAVING jumlah_pesanan > 0
                   ORDER BY jumlah_pesanan DESC
-                  LIMIT 1";
+                  LIMIT 3";
 $hasil_favorit    = $koneksi->query($query_favorit);
-$hotel_favorit_id = null;
+$hotel_terlaris_ids = [];
 if ($hasil_favorit && $hasil_favorit->num_rows > 0) {
-    $favorit_row      = $hasil_favorit->fetch_assoc();
-    $hotel_favorit_id = $favorit_row['id_hotel'];
+    while ($fav_row = $hasil_favorit->fetch_assoc()) {
+        $hotel_terlaris_ids[] = intval($fav_row['id_hotel']);
+    }
 }
 
 /* logika button love hilang ketika login role admin */
@@ -69,6 +121,23 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
             $loved_ids[] = intval($r['id_hotel']);
         }
     }
+}
+
+function hitungJarak(float $lat1, float $lng1, float $lat2, float $lng2): float {
+    $R = 6371; // radius bumi km
+    $dLat = deg2rad($lat2 - $lat1);
+    $dLng = deg2rad($lng2 - $lng1);
+    $a = sin($dLat/2) * sin($dLat/2)
+       + cos(deg2rad($lat1)) * cos(deg2rad($lat2))
+       * sin($dLng/2) * sin($dLng/2);
+    return $R * 2 * atan2(sqrt($a), sqrt(1 - $a));
+}
+
+function formatJarak(float $km): string {
+    if ($km < 1) {
+        return round($km * 1000) . ' m';
+    }
+    return number_format($km, 1) . ' km';
 }
 
 function getBadgeDiskon(array $row): array|false {
@@ -100,7 +169,8 @@ function getBadgeDiskon(array $row): array|false {
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <?php include 'komponen/style.php'; ?>
+    <!-- CSS utama index (dipindah dari style.php) -->
+    <link rel="stylesheet" href="/reservasi_hotel/css/style_index.css">
     <link rel="stylesheet" href="/reservasi_hotel/css/love.css">
 </head>
 
@@ -111,121 +181,107 @@ function getBadgeDiskon(array $row): array|false {
 
     <main class="container">
         <h2 class="section-title">
-            <?= $keyword !== '' ? "Hasil Pencarian untuk: '" . $keyword . "'" : "Temukan Hotel dan dapatkan penawaran terbaik!" ?>
+            <?php
+            if ($keyword !== '') {
+                echo "Hasil Pencarian untuk: '" . $keyword . "'";
+            } elseif ($lokasi_filter !== '') {
+            } elseif ($mode_terdekat) {
+                echo "Hotel Terdekat dari Lokasi Anda";
+            } else {
+                echo "Temukan Hotel dan dapatkan penawaran terbaik!";
+            }
+            ?>
         </h2>
 
         <section class="flex-hotel" style="display: block !important;">
 
             <!-- ============================================================
                  SKELETON CONTAINER
-                 Terdiri dari 3 bagian sesuai struktur halaman asli:
-                   1. Grid card biasa (4 kolom)
-                   2. Section diskon biru (slider)
-                   3. Card horizontal/list (baris bawah)
-                 Disembunyikan via JS setelah konten asli siap.
                  ============================================================ -->
             <div id="skeleton-container" style="width:100% !important; display:block !important;">
 
-                <!-- ── 1. SKELETON GRID CARD BIASA (4 kolom) ── -->
+                <?php if (!$ada_filter_aktif): ?>
+                <!-- ── 1. SKELETON GRID CARD BIASA (4 kolom) — hanya saat tanpa filter ── -->
                 <div class="grid-4-kolom">
-                    <?php for ($i = 0; $i < 4; $i++): ?>
+                    <?php for ($i = 0; $i < 8; $i++): ?>
                     <div class="card-hotel" style="box-shadow:none; overflow:hidden;">
-
-                        <!-- Gambar -->
                         <div class="sk-card-img shimmer"></div>
-
-                        <!-- Badge diskon strip menempel di bawah gambar -->
                         <div class="sk-badge-strip shimmer"></div>
-
                         <div class="sk-card-body">
-                            <!-- Judul hotel -->
                             <div class="sk-title shimmer"></div>
-                            <!-- Bintang rating -->
                             <div class="sk-stars shimmer"></div>
-                            <!-- Lokasi -->
                             <div class="sk-location shimmer"></div>
-                            <!-- Harga coret -->
                             <div class="sk-price-old shimmer"></div>
-                            <!-- Harga final -->
                             <div class="sk-price shimmer"></div>
                         </div>
                     </div>
                     <?php endfor; ?>
                 </div>
 
-                <!-- ── 2. SKELETON SECTION DISKON (latar biru) ── -->
+                <!-- ── 2. SKELETON SECTION DISKON (latar biru) — hanya saat tanpa filter ── -->
                 <div class="container-diskon-tengah">
                     <section class="section-diskon-besar">
-
-                        <!-- Judul section -->
                         <div class="shimmer-dark"
                             style="height:24px; width:220px; margin-bottom:30px; border-radius:4px;"></div>
-
-                        <!-- 4 card diskon dalam flex row -->
                         <div style="display:flex; gap:20px; overflow:hidden;">
                             <?php for ($i = 0; $i < 4; $i++): ?>
                             <div class="card-hotel" style="
-                                flex: 0 0 calc((100% - 60px) / 4);
-                                min-width: 0;
-                                box-shadow: none;
-                                overflow: hidden;
-                                background: rgba(255,255,255,0.08);
-                                border: 1px solid rgba(255,255,255,0.15);
-                            ">
-                                <!-- Gambar -->
+                    flex: 0 0 calc((100% - 60px) / 4);
+                    min-width: 0;
+                    box-shadow: none;
+                    overflow: hidden;
+                    background: rgba(255,255,255,0.08);
+                    border: 1px solid rgba(255,255,255,0.15);
+                ">
                                 <div class="sk-card-img shimmer-dark"></div>
-                                <!-- Badge diskon strip -->
                                 <div class="sk-badge-strip shimmer-dark"></div>
-
                                 <div class="sk-card-body">
                                     <div class="sk-title    shimmer-dark"></div>
                                     <div class="sk-stars    shimmer-dark"></div>
                                     <div class="sk-location shimmer-dark"></div>
-                                    <!-- Card diskon selalu punya harga coret -->
                                     <div class="sk-price-old shimmer-dark"></div>
                                     <div class="sk-price     shimmer-dark"></div>
                                 </div>
                             </div>
                             <?php endfor; ?>
                         </div>
-
                     </section>
                 </div>
+                <?php endif; ?>
 
-                <!-- ── 3. SKELETON CARD LIST HORIZONTAL (baris bawah) ── -->
-
-                <!-- Label lokasi skeleton -->
+                <!-- ── 3. SKELETON CARD LIST HORIZONTAL — selalu muncul ── -->
+                <?php if ($keyword !== ''): ?>
+                <div class="shimmer" style="height:22px; width:200px; margin-bottom:16px; border-radius:4px;"></div>
+                <?php elseif ($lokasi_filter !== ''): ?>
+                <div class="shimmer" style="height:22px; width:240px; margin-bottom:16px; border-radius:4px;"></div>
+                <?php elseif ($mode_terdekat): ?>
+                <div class="shimmer" style="height:22px; width:280px; margin-bottom:16px; border-radius:4px;"></div>
+                <?php else: ?>
                 <div class="shimmer" style="height:22px; width:260px; margin-bottom:16px; border-radius:4px;"></div>
+                <?php endif; ?>
 
                 <div style="display:flex; flex-direction:column; gap:20px; margin-bottom:30px;">
-                    <?php for ($i = 0; $i < 3; $i++): ?>
+                    <?php
+        // Jumlah skeleton card list menyesuaikan — filter tampilkan lebih banyak
+        $sk_count = $ada_filter_aktif ? 5 : 3;
+        for ($i = 0; $i < $sk_count; $i++):
+        ?>
                     <div class="sk-list-card">
-
-                        <!-- Kiri: gambar -->
                         <div class="sk-list-img shimmer"></div>
-
-                        <!-- Tengah: nama, bintang, lokasi -->
                         <div class="sk-list-center">
                             <div class="sk-list-title    shimmer"></div>
                             <div class="sk-list-stars    shimmer"></div>
                             <div class="sk-list-location shimmer"></div>
                         </div>
-
-                        <!-- Kanan: harga Standard & Deluxe -->
                         <div class="sk-list-right">
-                            <!-- Standard -->
                             <div class="sk-list-room-label shimmer"></div>
                             <div class="sk-list-price-old  shimmer"></div>
                             <div class="sk-list-price      shimmer"></div>
-
                             <div class="sk-list-divider"></div>
-
-                            <!-- Deluxe -->
                             <div class="sk-list-room-label shimmer"></div>
                             <div class="sk-list-price-old  shimmer"></div>
                             <div class="sk-list-price      shimmer"></div>
                         </div>
-
                     </div>
                     <?php endfor; ?>
                 </div>
@@ -240,7 +296,8 @@ function getBadgeDiskon(array $row): array|false {
             <div id="actual-content" style="width:100% !important; display:block !important;">
                 <?php if ($jumlah_hotel_biasa > 0 || $jumlah_hotel_diskon > 0): ?>
 
-                <!-- ── BARIS 1: GRID CARD BIASA (maks 4) ── -->
+                <?php if (!$ada_filter_aktif): ?>
+                <!-- ── BARIS 1: GRID CARD BIASA (maks 4) — hanya muncul saat TANPA filter ── -->
                 <div class="grid-4-kolom">
                     <?php
                     $counter = 0;
@@ -249,6 +306,8 @@ function getBadgeDiskon(array $row): array|false {
                         $counter++;
                         $id_hotel = $row['id_hotel'];
                         $badge    = getBadgeDiskon($row);
+                        $is_terlaris = in_array(intval($id_hotel), $hotel_terlaris_ids);
+                        $jarak_km = $row['_jarak_km'];
                     ?>
                     <a href="/reservasi_hotel/layanan_pemesanan/pesan.php?id_hotel=<?= $row['id_hotel']; ?>"
                         class="card-link">
@@ -260,8 +319,8 @@ function getBadgeDiskon(array $row): array|false {
                                 : "/reservasi_hotel/assets/" . $nama_foto;
                             ?>
 
-                            <?php if ($hotel_favorit_id == $row['id_hotel']): ?>
-                            <div class="favorite-badge">Favorit</div>
+                            <?php if ($is_terlaris): ?>
+                            <div class="favorite-badge">Terlaris</div>
                             <?php endif; ?>
 
                             <?php include 'komponen/btn_love.php'; ?>
@@ -277,6 +336,7 @@ function getBadgeDiskon(array $row): array|false {
 
                             <div class="card-body">
                                 <h3 class="card-title"><?= htmlspecialchars($row['nama_hotel']); ?></h3>
+
                                 <?php $rating = intval($row['rating'] ?? 0); ?>
                                 <?php if ($rating > 0): ?>
                                 <div class="card-rating">
@@ -290,9 +350,11 @@ function getBadgeDiskon(array $row): array|false {
                                     </div>
                                 </div>
                                 <?php endif; ?>
+
                                 <div class="card-meta">
                                     <span><?= htmlspecialchars($row['lokasi']); ?></span>
                                 </div>
+
                                 <div class="price-wrapper">
                                     <span class="price-amount">
                                         <?php
@@ -307,7 +369,7 @@ function getBadgeDiskon(array $row): array|false {
                                                 <?= number_format($harga_original, 0, ',', '.'); ?><span
                                                     style="position:absolute; left:0; right:0; top:50%; height:2px; background:#ef4444; transform:rotate(-3deg);"></span></span>
                                             <span class="discount-badge"
-                                                style="color:#991b1b; background:#fee2e2;">-<?= $diskon; ?>%</span>
+                                                style="color:#da0000;; background:#fee2e2;">-<?= $diskon; ?>%</span>
                                         </div>
                                         <?php endif; ?>
                                         <div class="price-row">
@@ -316,17 +378,27 @@ function getBadgeDiskon(array $row): array|false {
                                                     class="price-suffix">/Malam</span></span>
                                         </div>
                                     </span>
+                                    <!-- Badge jarak muncul di bawah harga, di dalam price-wrapper -->
+                                    <?php if ($jarak_km !== null): ?>
+                                    <span class="badge-jarak">
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                        </svg>
+                                        <?= formatJarak($jarak_km); ?>
+                                    </span>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </article>
                     </a>
                     <?php
-                        if ($counter == 4) break;
+                        if ($counter == 8) break;
                     endfor;
                     ?>
                 </div>
 
-                <!-- ── BARIS 2: SECTION DISKON (slider biru) ── -->
+                <!-- ── BARIS 2: SECTION DISKON (slider biru) — hanya muncul saat TANPA filter ── -->
                 <?php if ($jumlah_hotel_diskon > 0): ?>
                 <div class="container-diskon-tengah">
                     <section class="section-diskon-besar">
@@ -348,6 +420,8 @@ function getBadgeDiskon(array $row): array|false {
                                 <?php foreach ($hotel_diskon as $row_diskon):
                                     $id_hotel     = $row_diskon['id_hotel'];
                                     $badge_diskon = getBadgeDiskon($row_diskon);
+                                    $is_terlaris_diskon = in_array(intval($id_hotel), $hotel_terlaris_ids);
+                                    $jarak_diskon = $row_diskon['_jarak_km'];
                                 ?>
                                 <a href="/reservasi_hotel/layanan_pemesanan/pesan.php?id_hotel=<?= $row_diskon['id_hotel']; ?>"
                                     class="card-link">
@@ -358,7 +432,7 @@ function getBadgeDiskon(array $row): array|false {
                                             ? "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80"
                                             : "/reservasi_hotel/assets/" . $nama_foto;
                                         ?>
-                                        <?php if ($hotel_favorit_id == $row_diskon['id_hotel']): ?>
+                                        <?php if ($is_terlaris_diskon): ?>
                                         <div class="favorite-badge">Terlaris</div>
                                         <?php endif; ?>
 
@@ -374,8 +448,9 @@ function getBadgeDiskon(array $row): array|false {
                                         </div>
 
                                         <div class="card-body">
-                                            <h3 class="card-title"><?= htmlspecialchars($row_diskon['nama_hotel']); ?>
-                                            </h3>
+                                            <h3 class="card-title">
+                                                <?= htmlspecialchars($row_diskon['nama_hotel']); ?></h3>
+
                                             <?php $rating_diskon = intval($row_diskon['rating'] ?? 0); ?>
                                             <?php if ($rating_diskon > 0): ?>
                                             <div class="card-rating">
@@ -389,9 +464,11 @@ function getBadgeDiskon(array $row): array|false {
                                                 </div>
                                             </div>
                                             <?php endif; ?>
+
                                             <div class="card-meta">
                                                 <span><?= htmlspecialchars($row_diskon['lokasi']); ?></span>
                                             </div>
+
                                             <div class="price-wrapper">
                                                 <span class="price-amount">
                                                     <?php
@@ -405,7 +482,7 @@ function getBadgeDiskon(array $row): array|false {
                                                             <?= number_format($harga_original, 0, ',', '.'); ?><span
                                                                 style="position:absolute; left:0; right:0; top:50%; height:2px; background:#ef4444; transform:rotate(-3deg);"></span></span>
                                                         <span class="discount-badge"
-                                                            style="color:#991b1b; background:#fee2e2;">-<?= $diskon; ?>%</span>
+                                                            style="color:#da0000;; background:#fee2e2;">-<?= $diskon; ?>%</span>
                                                     </div>
                                                     <div class="price-row">
                                                         <span>IDR
@@ -413,6 +490,16 @@ function getBadgeDiskon(array $row): array|false {
                                                                 class="price-suffix">/Malam</span></span>
                                                     </div>
                                                 </span>
+                                                <!-- Badge jarak di bawah harga pada card diskon -->
+                                                <?php if ($jarak_diskon !== null): ?>
+                                                <span class="badge-jarak">
+                                                    <svg viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                                    </svg>
+                                                    <?= formatJarak($jarak_diskon); ?>
+                                                </span>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </article>
@@ -423,23 +510,30 @@ function getBadgeDiskon(array $row): array|false {
                     </section>
                 </div>
                 <?php endif; ?>
+                <?php endif; // tutup if (!$ada_filter_aktif) ?>
 
-                <!-- ── BARIS 3: CARD LIST HORIZONTAL (per lokasi) ── -->
+                <!-- ── BARIS 3: CARD LIST HORIZONTAL (per lokasi) ──
+                     Tanpa filter   : mulai dari index 4 (sisa setelah grid 4 kolom)
+                     Dengan filter  : mulai dari index 0 (SEMUA hotel tampil di sini)
+                ── -->
                 <?php
-                if ($jumlah_hotel_biasa > 4):
+                $index_mulai = $ada_filter_aktif ? 0 : 8;
+                if ($jumlah_hotel_biasa > $index_mulai):
                     $current_location = "";
                     echo '<div class="list-container-vertical">';
 
-                    for ($i = 4; $i < $jumlah_hotel_biasa; $i++):
+                    for ($i = $index_mulai; $i < $jumlah_hotel_biasa; $i++):
                         $row          = $hotel_biasa[$i];
                         $id_hotel     = $row['id_hotel'];
                         $badge        = getBadgeDiskon($row);
                         $lokasi_hotel = htmlspecialchars($row['lokasi']);
-
-                        if ($lokasi_hotel !== $current_location) {
-                            $current_location = $lokasi_hotel;
-                            echo '<h3 class="sub-section-location-title">Hotel Pilihan di ' . $current_location . '</h3>';
-                        }
+                        $is_terlaris  = in_array(intval($id_hotel), $hotel_terlaris_ids);
+                        $jarak_km     = $row['_jarak_km'];
+                        /* logika searchbar menampilkan keyword ketikan, dan filter lokasi terdaftar */    
+                        if (!$mode_terdekat && $keyword === '' && $lokasi_hotel !== $current_location) {
+    $current_location = $lokasi_hotel;
+    echo '<h3 class="sub-section-location-title">Hotel Pilihan di ' . $current_location . '</h3>';
+}
 
                         $nama_foto = $row['foto'];
                         $path_foto = (empty($nama_foto) || $nama_foto == 'default.jpg' || !file_exists("assets/" . $nama_foto))
@@ -463,9 +557,8 @@ function getBadgeDiskon(array $row): array|false {
 
                     <!-- KIRI: GAMBAR -->
                     <div class="list-img-section">
-                        <?php if ($hotel_favorit_id == $row['id_hotel']): ?>
-                        <div class="favorite-badge" style="position:absolute; top:10px; left:10px; z-index:3;">Favorit
-                        </div>
+                        <?php if ($is_terlaris): ?>
+                        <div class="favorite-badge">Terlaris</div>
                         <?php endif; ?>
 
                         <?php include 'komponen/btn_love.php'; ?>
@@ -493,7 +586,19 @@ function getBadgeDiskon(array $row): array|false {
                         </div>
                         <?php endif; ?>
 
-                        <div class="list-location"><?= $lokasi_hotel; ?></div>
+                        <!-- Lokasi + badge jarak berdampingan -->
+                        <div class="list-location-row">
+                            <span class="list-location"><?= $lokasi_hotel; ?></span>
+                            <?php if ($jarak_km !== null): ?>
+                            <span class="badge-jarak">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>
+                                <?= formatJarak($jarak_km); ?>
+                            </span>
+                            <?php endif; ?>
+                        </div>
                     </div>
 
                     <!-- KANAN: HARGA STANDARD & DELUXE -->
@@ -550,7 +655,7 @@ function getBadgeDiskon(array $row): array|false {
                 ?>
 
                 <?php else: ?>
-                <div class="empty-state">Tidak ditemukan Hotel yang cocok dengan kata kunci tersebut.</div>
+                <div class="empty-state">Hotel tidak ditemukan, silahkan ubah lokasi atau kata kunci.</div>
                 <?php endif; ?>
             </div>
             <!-- ── END KONTEN ASLI ── -->
@@ -572,15 +677,11 @@ function getBadgeDiskon(array $row): array|false {
         const skeleton = document.getElementById('skeleton-container');
         const content = document.getElementById('actual-content');
 
-        // ── ATUR DURASI SKELETON DI SINI ──────────────────────────────
-        const MINIMUM_DELAY = 1500; // ms — skeleton tampil minimal 1.5 detik
-        const FALLBACK_MAX = 5000; // ms — paksa tampil konten setelah 5 detik
-        // ──────────────────────────────────────────────────────────────
+        const MINIMUM_DELAY = 1500;
+        const FALLBACK_MAX = 5000;
 
         const startTime = Date.now();
 
-        // Fungsi tampilkan konten & sembunyikan skeleton
-        // Selalu tunggu sisa minimum delay dulu sebelum tampil
         function showContent() {
             const elapsed = Date.now() - startTime;
             const remaining = Math.max(0, MINIMUM_DELAY - elapsed);
@@ -592,11 +693,10 @@ function getBadgeDiskon(array $row): array|false {
                     skeleton.style.display = 'none';
                     content.style.opacity = '1';
                     content.style.pointerEvents = 'auto';
-                }, 300); // tunggu fade-out skeleton selesai
+                }, 300);
             }, remaining);
         }
 
-        // Cek apakah semua gambar di konten asli sudah selesai dimuat
         const images = content.querySelectorAll('img');
         if (images.length === 0) {
             showContent();
@@ -615,11 +715,10 @@ function getBadgeDiskon(array $row): array|false {
                 onImageDone();
             } else {
                 img.addEventListener('load', onImageDone);
-                img.addEventListener('error', onImageDone); // tetap lanjut walau gambar gagal
+                img.addEventListener('error', onImageDone);
             }
         });
 
-        // Fallback: paksa tampil setelah FALLBACK_MAX walau gambar belum selesai
         setTimeout(showContent, FALLBACK_MAX);
     });
     </script>
@@ -637,7 +736,6 @@ function getBadgeDiskon(array $row): array|false {
             let isDown = false,
                 startX, scrollLeft, isDragging = false;
 
-            /* Tampilkan/sembunyikan chevron sesuai posisi scroll */
             function updateChevronVisibility() {
                 if (window.innerWidth > 768) {
                     if (slider.scrollWidth <= slider.clientWidth) {
@@ -658,7 +756,6 @@ function getBadgeDiskon(array $row): array|false {
             window.addEventListener('resize', updateChevronVisibility);
             slider.addEventListener('scroll', updateChevronVisibility);
 
-            /* Klik chevron: geser satu lebar kartu */
             if (btnLeft && btnRight) {
                 const getScrollAmount = () => {
                     const firstCard = slider.querySelector('.card-link');
@@ -674,7 +771,6 @@ function getBadgeDiskon(array $row): array|false {
                 }));
             }
 
-            /* Drag mouse */
             wrapper.addEventListener('mousedown', (e) => {
                 if (e.target.closest('.chevron-btn')) return;
                 isDown = true;
@@ -698,7 +794,6 @@ function getBadgeDiskon(array $row): array|false {
                 slider.scrollLeft = scrollLeft - (e.pageX - slider.offsetLeft - startX) * 1.5;
             });
 
-            /* Cegah klik link saat drag */
             wrapper.querySelectorAll('.card-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     if (isDragging) e.preventDefault();
@@ -748,19 +843,6 @@ function getBadgeDiskon(array $row): array|false {
             .finally(() => {
                 btn.disabled = false;
             });
-    }
-
-    function updateNavLoveBadge(total) {
-        const badge = document.querySelector('.nav-love-badge');
-        if (!badge) return;
-        badge.setAttribute('data-count', total);
-        if (total > 0) {
-            badge.textContent = total;
-            badge.style.display = 'flex';
-        } else {
-            badge.textContent = '';
-            badge.style.display = 'none';
-        }
     }
     </script>
 

@@ -81,6 +81,11 @@ $punya_koordinat = ($hotel_lat !== null && $hotel_lng !== null);
 
     <link rel="stylesheet" href="../css/style_navigasi.css">
     <link rel="stylesheet" href="../css/style_pesan.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+        rel="stylesheet">
+
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -225,7 +230,7 @@ $punya_koordinat = ($hotel_lat !== null && $hotel_lng !== null);
 
         <div class="rekomendasi-grid">
             <?php
-            $query_rekomendasi = "SELECT h.id_hotel, h.nama_hotel, h.lokasi, h.deskripsi, h.foto, k.harga_per_malam, k.diskon_persen FROM hotel h LEFT JOIN kamar k ON h.id_hotel = k.id_hotel WHERE h.lokasi = ? AND h.id_hotel != ? GROUP BY h.id_hotel LIMIT 8";
+            $query_rekomendasi = "SELECT h.id_hotel, h.nama_hotel, h.lokasi, h.deskripsi, h.foto, h.rating, k.harga_per_malam, k.diskon_persen FROM hotel h LEFT JOIN kamar k ON h.id_hotel = k.id_hotel WHERE h.lokasi = ? AND h.id_hotel != ? GROUP BY h.id_hotel LIMIT 8";
             $stmt_rekomendasi = $koneksi->prepare($query_rekomendasi);
             $stmt_rekomendasi->bind_param("si", $data_hotel['lokasi'], $id_hotel);
             $stmt_rekomendasi->execute();
@@ -250,7 +255,19 @@ $punya_koordinat = ($hotel_lat !== null && $hotel_lng !== null);
                     </div>
                     <div class="card-body">
                         <h3 class="card-title"><?= htmlspecialchars($hotel_rekomendasi['nama_hotel']); ?></h3>
-                        <div class="card-meta">
+
+                      <?php $rating_rek = intval($hotel_rekomendasi['rating'] ?? 0); ?>
+    <?php if ($rating_rek > 0): ?>
+    <div class="card-rating" style="margin-bottom: 8px;">
+        <div class="rating-stars">
+            <?php for ($j = 1; $j <= $rating_rek; $j++): ?>
+            <svg class="star-icon" viewBox="0 0 24 24" style="width:14px;height:14px;fill:#f97316;">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <?php endfor; ?>
+        </div>
+    </div>
+    <?php endif; ?>  <div class="card-meta">
                             <span><?= htmlspecialchars($hotel_rekomendasi['lokasi']); ?></span>
                         </div>
                         <div class="price-wrapper">

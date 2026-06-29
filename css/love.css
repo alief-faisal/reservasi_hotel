@@ -3,7 +3,8 @@
 /* ==========================================================================
    A. STRUKTUR GRID & CARD SIMETRIS MUTLAK (Kunci Utama Tinggi Sama Rata)
    ========================================================================== */
-
+html {
+    overflow-y: scroll;
 .love-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -113,7 +114,6 @@
 .price-original {
   font-size: 0.75rem;
   color: #94a3b8;
-  text-decoration: line-through;
   font-weight: 400;
 }
 
@@ -373,4 +373,5 @@
 
 @media (max-width: 768px) {
   .nav-love-link span.love-label { display: none; }
+}
 }
