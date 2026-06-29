@@ -597,8 +597,6 @@ body {
   display: inline-block;
 }
 
-
-
 /* Badge diskon (pill kecil merah muda) */
 .discount-badge {
   display: inline-block;
@@ -620,30 +618,29 @@ body {
    dengan efek 3D timbul (shadow + sedikit rotate)
    ============================================= */
 .favorite-badge {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    padding: 6px 14px 6px 10px;
-    font-size: 12px;
-    font-weight: 900;
-    letter-spacing: 0.2px;
-    color: #fff;
-    background: linear-gradient(135deg, #FFE066 0%, #f8a100 55%, #FF7A00 100%);
-    border-radius: 0 0 16px 0; /* hanya sudut kanan bawah */
-    box-shadow:
-        2px 2px 8px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    pointer-events: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    transform: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  padding: 6px 14px 6px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  color: #fff;
+  background: linear-gradient(135deg, #ffe066 0%, #f8a100 55%, #ff7a00 100%);
+  border-radius: 0 0 16px 0; /* hanya sudut kanan bawah */
+  box-shadow:
+    2px 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transform: none;
 }
 
-
 .favorite-badge::after {
-    display: none;
+  display: none;
 }
 
 /* =============================================
@@ -856,9 +853,32 @@ body {
    ============================================= */
 .section-diskon-besar {
   margin: 40px 0;
-  background: linear-gradient(135deg, #002a61 0%, #152bf5 100%);
+  /* Tambahkan properti untuk animasi slow blend */
+  background: linear-gradient(
+    135deg,
+    #002a61 0%,
+    #152bf5 100%,
+    #1a1a2e 0%
+  ); /* Ditambah satu warna untuk blend */
+  background-size: 200% 200%; /* Membesarkan background untuk animasi gradien */
   padding: 40px;
   border-radius: 12px;
+  animation: slowBlend 10s ease infinite; /* Animasi berjalan perlahan (10s), looping selamanya */
+}
+
+/* =============================================
+   ANIMASI SLOW BLEND (WARNA BERGERAK)
+   ============================================= */
+@keyframes slowBlend {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .section-title-diskon {
@@ -948,9 +968,7 @@ body {
   right: -22px;
 }
 
-/* =============================================
-   BADGE DISKON DI DALAM GAMBAR KARTU
-   ============================================= */
+/* badge card diskon */
 .badge-diskon-strip {
   position: absolute;
   bottom: 0;
@@ -963,21 +981,40 @@ body {
   padding: 6px 10px;
   z-index: 2;
   box-sizing: border-box;
+  background-size: 200% 100% !important;
+  /* animasi ombak looping */
+  animation: efekOmbak 5s infinite linear;
 }
 
+/* animasi ombak card standard */
 .badge-diskon-standard {
-  background: linear-gradient(90deg, #ff3030, #6d0000);
+  background: linear-gradient(
+    90deg,
+    #6d0000 0%, #000000 25%, #ff8585 50%, #000000 75%, #6d0000 100%
+  );
   color: #fff;
 }
 
+/* animasi ombak card deluxe */
 .badge-diskon-deluxe {
-  background: linear-gradient(90deg, #2723ff, #00014b);
+  background: linear-gradient(
+    90deg,
+    #00014b 0%, #000000 25%,#0400ff 50%, #000000 75%, #00014b 100%
+  );
   color: #fff;
 }
 
-/* =============================================
-   CARD HOTEL LIST (TAMPILAN BARIS / LIST VIEW)
-   ============================================= */
+@keyframes efekOmbak {
+  0%,
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}
+
+/* card hotel horizontal */
 .sub-section-location-title {
   font-size: 1.5rem;
   font-weight: 600;

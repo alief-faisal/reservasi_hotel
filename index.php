@@ -367,7 +367,7 @@ function getBadgeDiskon(array $row): array|false {
                                             <span class="price-original"
                                                 style="position:relative; display:inline-block; color:#9ca3af;">IDR
                                                 <?= number_format($harga_original, 0, ',', '.'); ?><span
-                                                    style="position:absolute; left:0; right:0; top:50%; height:2px; background:#ef4444; transform:rotate(-3deg);"></span></span>
+                                                    style="position:absolute; left:0; right:0; top:50%; height:2px; background:#ef4444; transform:rotate(-4deg);"></span></span>
                                             <span class="discount-badge"
                                                 style="color:#da0000;; background:#fee2e2;">-<?= $diskon; ?>%</span>
                                         </div>
@@ -393,7 +393,7 @@ function getBadgeDiskon(array $row): array|false {
                         </article>
                     </a>
                     <?php
-                        if ($counter == 8) break;
+                        if ($counter == 4) break;
                     endfor;
                     ?>
                 </div>
@@ -517,7 +517,7 @@ function getBadgeDiskon(array $row): array|false {
                      Dengan filter  : mulai dari index 0 (SEMUA hotel tampil di sini)
                 ── -->
                 <?php
-                $index_mulai = $ada_filter_aktif ? 0 : 8;
+                $index_mulai = $ada_filter_aktif ? 0 : 4;
                 if ($jumlah_hotel_biasa > $index_mulai):
                     $current_location = "";
                     echo '<div class="list-container-vertical">';
