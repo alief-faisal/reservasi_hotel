@@ -92,6 +92,52 @@ $jumlah_hotel_biasa  = count($hotel_biasa);
 $jumlah_hotel_diskon = count($hotel_diskon);
 
 /* ============================================================
+   QUERY TERPISAH KHUSUS CARD BARIS PERTAMA (grid 4 kolom)
+   ----------------------------------------------------------
+   Kenapa perlu query terpisah?
+   Query utama di atas pakai "ORDER BY h.lokasi ASC, RAND()".
+   Itu artinya data diurutkan dulu berdasarkan lokasi (A-Z),
+   baru di-random DI DALAM tiap grup lokasi yang sama.
+   Akibatnya, hotel yang nongol duluan (index 0-3) selalu
+   dari satu wilayah yang sama (misal yang paling awal abjad),
+   bukan acak dari berbagai daerah.
+
+   Supaya baris pertama benar-benar acak lintas wilayah dan
+   berubah setiap refresh, kita ambil 4 hotel dengan query
+   ORDER BY RAND() murni (tanpa ikut urutan lokasi).
+   ============================================================ */
+$hotel_grid_atas = [];
+if (!$ada_filter_aktif) {
+    $query_random4 = "SELECT h.*,
+            MAX(CASE WHEN k.tipe_kamar = 'Standard' THEN k.harga_per_malam END) AS harga_standard,
+            MAX(CASE WHEN k.tipe_kamar = 'Standard' THEN k.diskon_persen END) AS diskon_standard,
+            MAX(CASE WHEN k.tipe_kamar = 'Deluxe'   THEN k.harga_per_malam END) AS harga_deluxe,
+            MAX(CASE WHEN k.tipe_kamar = 'Deluxe'   THEN k.diskon_persen END) AS diskon_deluxe,
+            MIN(k.harga_per_malam) AS harga_per_malam,
+            MAX(k.diskon_persen)   AS diskon_persen
+          FROM hotel h
+          LEFT JOIN kamar k ON h.id_hotel = k.id_hotel
+          GROUP BY h.id_hotel
+          ORDER BY RAND()
+          LIMIT 4";
+    $hasil_random4 = $koneksi->query($query_random4);
+    if ($hasil_random4 && $hasil_random4->num_rows > 0) {
+        while ($row = $hasil_random4->fetch_assoc()) {
+            if ($mode_terdekat
+                && isset($row['latitude']) && isset($row['longitude'])
+                && $row['latitude'] !== null && $row['longitude'] !== null
+                && $row['latitude'] !== '' && $row['longitude'] !== '') {
+                $row['_jarak_km'] = hitungJarak($user_lat, $user_lng, floatval($row['latitude']), floatval($row['longitude']));
+            } else {
+                $row['_jarak_km'] = null;
+            }
+            $hotel_grid_atas[] = $row;
+        }
+    }
+}
+$jumlah_grid_atas = count($hotel_grid_atas);
+
+/* ============================================================
    Logika 3 hotel dengan pesanan terbanyak hari ini
    ============================================================ */
 $query_favorit = "SELECT h.id_hotel, COUNT(DISTINCT b.id_pemesanan) as jumlah_pesanan
@@ -290,13 +336,11 @@ function getBadgeDiskon(array $row): array|false {
                 <?php if ($jumlah_hotel_biasa > 0 || $jumlah_hotel_diskon > 0): ?>
 
                 <?php if (!$ada_filter_aktif): ?>
-                <!-- card baris pertama -->
+                <!-- card baris pertama (RANDOM lintas wilayah, sumber: $hotel_grid_atas) -->
                 <div class="grid-4-kolom">
                     <?php
-                    $counter = 0;
-                    for ($i = 0; $i < $jumlah_hotel_biasa; $i++):
-                        $row      = $hotel_biasa[$i];
-                        $counter++;
+                    for ($i = 0; $i < $jumlah_grid_atas; $i++):
+                        $row      = $hotel_grid_atas[$i];
                         $id_hotel = $row['id_hotel'];
                         $badge    = getBadgeDiskon($row);
                         $is_terlaris = in_array(intval($id_hotel), $hotel_terlaris_ids);
@@ -386,7 +430,6 @@ function getBadgeDiskon(array $row): array|false {
                         </article>
                     </a>
                     <?php
-                        if ($counter == 4) break;
                     endfor;
                     ?>
                 </div>
@@ -507,7 +550,7 @@ function getBadgeDiskon(array $row): array|false {
 
                 <!-- card baris ketiga -->
                 <?php
-                $index_mulai = $ada_filter_aktif ? 0 : 4;
+                $index_mulai = $ada_filter_aktif ? 0 : 0;
                 if ($jumlah_hotel_biasa > $index_mulai):
                     $current_location = "";
                     echo '<div class="list-container-vertical">';
