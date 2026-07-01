@@ -1,8 +1,4 @@
 <?php
-// ============================================================
-//  layanan_wishlist/halaman_love.php
-//  Halaman daftar hotel yang disimpan (wishlist)
-// ============================================================
 session_start();
 $koneksi = new mysqli("localhost", "root", "", "reservasi_hotel");
 
@@ -48,7 +44,7 @@ $jumlah = count($daftar_love);
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
         rel="stylesheet">
 
-    <?php include '../komponen/style.php'; ?>
+    <link rel="stylesheet" href="/reservasi_hotel/css/style_index.css">
 
     <link rel="stylesheet" href="/reservasi_hotel/css/love.css">
 </head>

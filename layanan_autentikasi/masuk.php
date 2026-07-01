@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit();
             }
         } else {
-            // Cek apakah email sudah terdaftar
+            // cek apakah email sudah terdaftar
             $stmt_cek = $koneksi->prepare("SELECT * FROM pengguna WHERE email = ?");
             $stmt_cek->bind_param("s", $email);
             $stmt_cek->execute();
@@ -56,9 +56,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     exit();
                 }
             } else {
-                // Insert akun baru ke database
+                // password hash
+                $password_hashed = password_hash($password, PASSWORD_DEFAULT);
+
+                // insert akun baru ke database menggunakan variabel $password_hashed
                 $stmt_insert = $koneksi->prepare("INSERT INTO pengguna (nama, email, password, peran) VALUES (?, ?, ?, ?)");
-                $stmt_insert->bind_param("ssss", $nama, $email, $password, $peran);
+                $stmt_insert->bind_param("ssss", $nama, $email, $password_hashed, $peran);
 
                 if ($stmt_insert->execute()) {
                     $pesan_sukses = "Akun berhasil dibuat! Silakan login dengan email dan password Anda.";
@@ -100,8 +103,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($hasil->num_rows > 0) {
             $user = $hasil->fetch_assoc();
             
-            // untuk mencocokkan password yang dimasukkan dengan yang ada di database
-            if ($password === $user['password']) {
+            // [BAGIAN DIUBAH]: Menggunakan password_verify untuk mencocokkan input teks biasa dengan hash di database
+            if (password_verify($password, $user['password'])) {
                 $_SESSION['id_pengguna'] = $user['id_pengguna'];
                 $_SESSION['nama'] = $user['nama'];
                 $_SESSION['peran'] = $user['peran'];

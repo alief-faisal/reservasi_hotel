@@ -1,5 +1,5 @@
 <script>
-// Fungsi untuk membuka modal dan switch ke tab tertentu
+// fungsi untuk membuka modal dan switch ke tab tertentu
 function openLoginModal(tab = 'login') {
     const loginModal = document.getElementById('loginModal');
     if (loginModal) {
@@ -9,23 +9,23 @@ function openLoginModal(tab = 'login') {
     }
 }
 
-// Fungsi untuk toggle password di modal
+// fungsi untuk toggle password di modal
 function toggleModalPassword(inputId) {
     const input = document.getElementById(inputId);
     const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
     input.setAttribute('type', type);
 }
 
-// Fungsi untuk berpindah antar tab di modal
+// fungsi untuk berpindah antar tab di modal
 function switchModalTab(tab) {
-    // Sembunyikan semua tab
+    // sembunyikan semua tab
     document.getElementById('tab-login').classList.remove('active');
     document.getElementById('tab-daftar').classList.remove('active');
 
-    // Sembunyikan alert
+    // sembunyikan alert
     document.getElementById('alertContainer').innerHTML = '';
 
-    // Tampilkan tab yang dipilih
+    // tampilkan tab yang dipilih
     if (tab === 'login') {
         document.getElementById('tab-login').classList.add('active');
         document.getElementById('modalTitle').textContent = 'Masuk Akun';
@@ -49,23 +49,23 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }, 600); /* skeleton 0.6  */
 
-    // Logika modal login pop-up
+    // logika modal login pop-up
     const loginModal = document.getElementById('loginModal');
     const btnNanti = document.getElementById('btnNanti');
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
 
-    // Hitung jumlah refresh di halaman utama
+    // logika hitung jumlah refresh di halaman utama
     let refreshCount = parseInt(sessionStorage.getItem('refreshCount')) || 0;
     refreshCount++;
     sessionStorage.setItem('refreshCount', refreshCount);
 
-    // Tampilkan popup saat refresh 2x
+    // logika tampilkan popup saat refresh 2x
     if (refreshCount % 2 === 0 && loginModal) {
-        // Disable scroll saat popup muncul
+        // disable scroll background saat popup muncul
         document.body.style.overflow = 'hidden';
     } else if (loginModal) {
-        // Sembunyikan popup saat refresh ganjil
+        // sembunyikan popup saat refresh ganjil
         loginModal.style.display = 'none';
     }
 
@@ -73,9 +73,9 @@ window.addEventListener('DOMContentLoaded', () => {
         btnNanti.addEventListener('click', (e) => {
             e.preventDefault();
             loginModal.style.display = 'none';
-            // Enable scroll kembali
+            // mengaktifkan scroll kembali
             document.body.style.overflow = 'auto';
-            // Reset counter saat modal ditutup
+            // reset counter saat modal ditutup
             sessionStorage.setItem('refreshCount', 0);
         });
     }
@@ -105,7 +105,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (data.success) {
-                    // Login berhasil
+                    // login berhasil
                     window.location.href = '/reservasi_hotel/index.php';
                 } else {
                     alertContainer.innerHTML =
@@ -130,7 +130,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const konfirmasi_password = document.getElementById('konfirmasi-password').value;
             const alertContainer = document.getElementById('alertContainer');
 
-            // Validasi client-side
+            // validasi dari client-side
             if (!nama || !email || !password || !konfirmasi_password) {
                 alertContainer.innerHTML = '<div class="alert">Semua field harus diisi.</div>';
                 return;
@@ -165,7 +165,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (data.success) {
-                    // Daftar berhasil
+                    // daftar berhasil
                     alertContainer.innerHTML =
                         '<div class="alert-success">Akun berhasil dibuat! Silakan login dengan akun Anda.</div>';
 

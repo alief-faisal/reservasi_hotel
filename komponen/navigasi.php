@@ -27,9 +27,7 @@ while ($rowL = $hasilLokasi->fetch_assoc()) {
     $daftarLokasi[] = $rowL['lokasi'];
 }
 
-/* ============================================================
-   HITUNG JUMLAH WISHLIST USER UNTUK BADGE NAVBAR
-   ============================================================ */
+/* logika hitung jumlah wishlist user untuk badge navbar */
 $jumlah_wishlist = 0;
 if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
     $id_nav = intval($_SESSION['id_pengguna']);
@@ -47,44 +45,10 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
 <link rel="stylesheet" type="text/css" href="/reservasi_hotel/css/style_navigasi.css">
 <link rel="stylesheet" type="text/css" href="/reservasi_hotel/css/love.css">
 
-<!-- Inject CSS overlay langsung agar pasti berada di bawah search bar tapi di atas logo/menu -->
-<style>
-#search-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    /* Menggelapkan layar */
-    z-index: 10;
-    /* Berada di bawah search-lokasi-wrapper */
-    display: none;
-}
-
-#search-overlay.active {
-    display: block;
-}
-
-/* Memastikan elemen pendukung overlay memiliki z-index yang tepat */
-.brand-logo,
-.user-menu-container {
-    position: relative;
-    z-index: 5;
-    /* Di bawah overlay ketika overlay aktif */
-}
-
-.search-lokasi-wrapper {
-    position: relative;
-    z-index: 20 !important;
-    /* Wajib di atas overlay agar tetap menyala */
-}
-</style>
-
 <header
     style="width: 100%; background-color: #1B0091; padding: 16px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);">
 
-    <!-- PINDAH KE SINI: Overlay sekarang berada di dalam header agar satu context stacking dengan logo dan menu -->
+    <!-- logika overlay spotlight header -->
     <div id="search-overlay" onclick="tutupSearchOverlay()"></div>
 
     <div
@@ -97,10 +61,10 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
             </a>
 
             <?php if ($halaman_sekarang !== 'kelola_hotel.php'): ?>
-            <!-- ===== SEARCH + DROPDOWN LOKASI ===== -->
+            <!-- search + dropdown lokasi -->
             <div class="search-lokasi-wrapper">
 
-                <!-- Ikon search -->
+                <!-- svg ikon search -->
                 <svg class="search-icon" viewBox="0 0 24 24">
                     <path
                         d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
@@ -115,10 +79,10 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
                         style="flex:1; min-width:0; padding:10px 14px 10px 40px; font-size:0.9rem; border:none; outline:none; background:transparent; font-family:inherit;">
                 </form>
 
-                <!-- Divider vertikal -->
+                <!-- divider / garis pembagi pembagi vertikal -->
                 <div class="lokasi-divider"></div>
 
-                <!-- Tombol dropdown lokasi -->
+                <!-- tombol dropdown lokasi -->
                 <button type="button" class="btn-lokasi-dropdown" id="btnLokasiDropdown" aria-expanded="false">
                     <svg viewBox="0 0 24 24" class="chevron-lokasi"
                         style="width:14px;height:14px; fill:#475569; flex-shrink:0; margin-right:2px;">
@@ -131,10 +95,10 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
                     </svg>
                 </button>
 
-                <!-- Panel dropdown lokasi -->
+                <!-- panel dropdown lokasi -->
                 <div class="lokasi-dropdown-panel" id="lokasiDropdownPanel">
 
-                    <!-- Opsi deteksi lokasi terdekat (GPS) -->
+                    <!-- opsi deteksi lokasi terdekat (GPS) -->
                     <button type="button" class="lokasi-item lokasi-item-terdekat" id="btnLokasiTerdekat">
                         <svg viewBox="0 0 24 24">
                             <path
@@ -145,7 +109,7 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
 
                     <div class="lokasi-divider-item"></div>
 
-                    <!-- Opsi semua lokasi -->
+                    <!-- opsi semua lokasi -->
                     <button type="button" class="lokasi-item <?= $lokasi_filter === '' ? 'active' : ''; ?>"
                         data-lokasi="">
                         <svg viewBox="0 0 24 24">
@@ -155,7 +119,7 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
                         Semua Lokasi
                     </button>
 
-                    <!-- Daftar lokasi dari DB -->
+                    <!-- daftar lokasi dari database -->
                     <?php foreach ($daftarLokasi as $lok): ?>
                     <button type="button" class="lokasi-item <?= ($lokasi_filter === $lok) ? 'active' : ''; ?>"
                         data-lokasi="<?= htmlspecialchars($lok); ?>">
@@ -169,13 +133,12 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
 
                 </div>
             </div>
-            <!-- ===================================== -->
             <?php endif; ?>
         </div>
 
         <div class="user-menu-container">
 
-            <!-- Hamburger menu -->
+            <!-- hamburger menu mobile -->
             <button type="button" class="hamburger-btn" id="hamburgerToggle" aria-label="Menu">
                 <span></span>
                 <span></span>
@@ -184,11 +147,31 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
             <div class="menu-links-wrapper" id="menuLinks">
                 <?php if (isset($_SESSION['peran'])): ?>
 
+
+                <!-- desktop: wishlist dengan label -->
+                <a href="/reservasi_hotel/layanan_wishlist/halaman_love.php" class="nav-love-link" title="Wishlist">
+                    <svg class="nav-love-icon <?= $jumlah_wishlist > 0 ? 'filled' : ''; ?>" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                    <span class="nav-love-label">Wishlist</span>
+                    <?php if ($jumlah_wishlist > 0): ?>
+                    <span class="nav-love-badge" data-count="<?= $jumlah_wishlist; ?>">
+                        <?= $jumlah_wishlist; ?>
+                    </span>
+                    <?php else: ?>
+                    <span class="nav-love-badge" data-count="0" style="display:none;"></span>
+                    <?php endif; ?>
+                </a>
+
+                <span class="divider" style="color: #cbd5e1;">|</span>
+
                 <?php if (!$is_admin): ?>
-                <!-- ===== DESKTOP: Nama → Dropdown Menu ===== -->
+                <!-- desktop: nama → dropdown menu -->
                 <div class="user-dropdown-wrapper" id="userDropdownWrapper">
                     <button type="button" class="btn-user-nama" id="btnUserNama">
-                        <!-- Icon SVG User Baru -->
+                        <!-- icon svg user baru -->
                         <svg class="icon-user" viewBox="0 0 24 24"
                             style="width: 20px; height: 20px; vertical-align: middle; fill: currentColor; margin-right: 8px;">
                             <path
@@ -201,7 +184,7 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
                     </button>
                     <div class="user-dropdown-menu" id="userDropdownMenu">
                         <div class="user-dropdown-header">
-                            <!-- Icon SVG User Baru di Header Dropdown -->
+                            <!-- icon svg user baru di header dropdown -->
                             <svg class="icon-user-header" viewBox="0 0 24 24"
                                 style="width: 18px; height: 18px; vertical-align: middle; fill: currentColor; margin-right: 8px;">
                                 <path
@@ -227,27 +210,12 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
                     </div>
                 </div>
 
-                <span class="divider" style="color: #cbd5e1;">|</span>
 
-                <!-- ===== DESKTOP: Wishlist dengan label ===== -->
-                <a href="/reservasi_hotel/layanan_wishlist/halaman_love.php" class="nav-love-link" title="Wishlist">
-                    <svg class="nav-love-icon <?= $jumlah_wishlist > 0 ? 'filled' : ''; ?>" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
-                    <span class="nav-love-label">Wishlist</span>
-                    <?php if ($jumlah_wishlist > 0): ?>
-                    <span class="nav-love-badge" data-count="<?= $jumlah_wishlist; ?>">
-                        <?= $jumlah_wishlist; ?>
-                    </span>
-                    <?php else: ?>
-                    <span class="nav-love-badge" data-count="0" style="display:none;"></span>
-                    <?php endif; ?>
-                </a>
+
+
 
                 <?php else: ?>
-                <!-- ===== ADMIN DESKTOP ===== -->
+                <!-- admin tampilan desktop -->
                 <a href="/reservasi_hotel/layanan_hotel/kelola_hotel.php"
                     style="color: #FFFFFF; text-decoration: none; font-weight: 600;">Admin Panel</a>
                 <span class="divider" style="color: #cbd5e1;">|</span>
@@ -256,7 +224,7 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
                 <?php endif; ?>
 
                 <?php else: ?>
-                <!-- ===== BELUM LOGIN DESKTOP ===== -->
+                <!-- desktop : button belum login  -->
                 <button type="button" class="btn-masuk" onclick="openLoginModal('login')"
                     style="background: none; border: none; color: #FFFFFF; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
                     Masuk
@@ -272,11 +240,8 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
     </div>
 </header>
 
-<!-- BARIS OVERLAY LAMA DI SINI SUDAH DIHAPUS & DIPINDAHKAN KE DALAM HEADER DI ATAS -->
 
-<!-- ============================================================
-     MOBILE HAMBURGER MENU PANEL (terpisah, di luar header flow)
-     ============================================================ -->
+<!-- mobile hamburger menu panel -->
 <div id="mobileMenuPanel"
     style="display:none; position:fixed; top:80px; right:16px; background:#FFFFFF; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:12px; min-width:220px; z-index:1050; box-shadow:0 10px 30px rgba(0,0,0,0.25); flex-direction:column; gap:4px;">
     <?php if (isset($_SESSION['peran'])): ?>
@@ -305,11 +270,10 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
 
     <?php else: ?>
     <a href="/reservasi_hotel/layanan_hotel/kelola_hotel.php" class="mobile-riwayat-link">Admin Panel</a>
-    <!-- Divider atas tetap dipertahankan jika memang butuh batas dengan menu di atasnya -->
+    <!-- pembatasan vertikal -->
     <div class="mobile-menu-divider"></div>
 
     <a href="/reservasi_hotel" class="mobile-beranda-btn">Beranda</a>
-    <!-- Divider di tengah ini DIHAPUS -->
     <a href="/reservasi_hotel/layanan_autentikasi/keluar.php" class="mobile-keluar-btn">Keluar</a>
 
     <?php endif; ?>
@@ -353,9 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* ============================================================
-        USER DROPDOWN DESKTOP
-       ============================================================ */
+    /* desktop : user dropdown */
     const userDropdownWrapper = document.getElementById('userDropdownWrapper');
     const btnUserNama = document.getElementById('btnUserNama');
 
@@ -371,9 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* ============================================================
-        DROPDOWN LOKASI
-       ============================================================ */
+    /* dropdown lokasi */
     const btnLokasi = document.getElementById('btnLokasiDropdown');
     const panelLokasi = document.getElementById('lokasiDropdownPanel');
     const hiddenLokasi = document.getElementById('hiddenLokasi');
@@ -445,9 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /* ============================================================
-        ANIMASI PLACEHOLDER SEARCHBAR
-       ============================================================ */
+    /* logika animasi placeholder searchbar */
     const searchInput = document.getElementById('searchInput');
     if (!searchInput) return;
 
@@ -501,9 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    /* ============================================================
-       SEARCH OVERLAY — kunci scroll saat searchbar aktif
-       ============================================================ */
+    /* logika mengunci background saat searchbar aktif spotlight */
     const searchOverlay = document.getElementById('search-overlay');
     const searchLokasi = document.querySelector('.search-lokasi-wrapper');
     const headerEl = document.querySelector('header');
@@ -512,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (searchOverlay) searchOverlay.classList.add('active');
         if (headerEl) headerEl.classList.add('overlay-active');
 
-        // UBAH BAGIAN INI: Mengunci scroll tanpa menghilangkan scrollbar bawaan browser
+        // logika tanpa menghilangkan scrollbar bawaan browser saat mengunci scroll 
         document.body.style.top = `-${window.scrollY}px`;
         document.body.style.position = 'fixed';
         document.body.style.width = '100%';
@@ -525,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnLokasi) btnLokasi.classList.remove('open');
         if (searchInput) searchInput.blur();
 
-        // UBAH BAGIAN INI: Mengembalikan posisi scroll ke semula saat overlay ditutup
+        // logika mengembalikan posisi scroll ke semula saat overlay ditutup
         const scrollY = document.body.style.top;
         document.body.style.position = '';
         document.body.style.top = '';
@@ -550,9 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-/* ============================================================
-    UPDATE BADGE WISHLIST
-   ============================================================ */
+/* logika update badge wishlist */
 function updateNavLoveBadge(total) {
     const badge = document.querySelector('.nav-love-badge');
     if (badge) {

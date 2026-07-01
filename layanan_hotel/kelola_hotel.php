@@ -56,10 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['tambah_hotel'])) {
         }
     }
 
-    /* Simpan hotel — pastikan kolom latitude & longitude sudah ada di tabel hotel:
-       ALTER TABLE hotel ADD COLUMN latitude DECIMAL(10,7) NULL;
-       ALTER TABLE hotel ADD COLUMN longitude DECIMAL(10,7) NULL;
-    */
+    /* Simpan hotel */
     $stmt = $koneksi->prepare("INSERT INTO hotel (nama_hotel, deskripsi, lokasi, foto, rating, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssidd", $nama, $deskripsi, $lokasi, $nama_file_final, $rating, $latitude, $longitude);
 
