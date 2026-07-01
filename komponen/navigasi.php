@@ -40,6 +40,7 @@ if (isset($_SESSION['id_pengguna']) && ($_SESSION['peran'] ?? '') !== 'admin') {
 $is_admin   = isset($_SESSION['peran']) && $_SESSION['peran'] === 'admin';
 $is_user    = isset($_SESSION['id_pengguna']) && !$is_admin;
 $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
+$nama_admin = $is_admin ? htmlspecialchars($_SESSION['nama'] ?? 'Admin') : '';
 ?>
 
 <link rel="stylesheet" type="text/css" href="/reservasi_hotel/css/style_navigasi.css">
@@ -147,7 +148,7 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
             <div class="menu-links-wrapper" id="menuLinks">
                 <?php if (isset($_SESSION['peran'])): ?>
 
-
+                <?php if (!$is_admin): ?>
                 <!-- desktop: wishlist dengan label -->
                 <a href="/reservasi_hotel/layanan_wishlist/halaman_love.php" class="nav-love-link" title="Wishlist">
                     <svg class="nav-love-icon <?= $jumlah_wishlist > 0 ? 'filled' : ''; ?>" viewBox="0 0 24 24"
@@ -166,6 +167,9 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
                 </a>
 
                 <span class="divider" style="color: #cbd5e1;">|</span>
+                <?php endif; ?>
+
+
 
                 <?php if (!$is_admin): ?>
                 <!-- desktop: nama → dropdown menu -->
@@ -210,17 +214,46 @@ $nama_user  = $is_user ? htmlspecialchars($_SESSION['nama']) : '';
                     </div>
                 </div>
 
-
-
-
-
                 <?php else: ?>
-                <!-- admin tampilan desktop -->
-                <a href="/reservasi_hotel/layanan_hotel/kelola_hotel.php"
-                    style="color: #FFFFFF; text-decoration: none; font-weight: 600;">Admin Panel</a>
-                <span class="divider" style="color: #cbd5e1;">|</span>
-                <a href="/reservasi_hotel/layanan_autentikasi/keluar.php" class="btn-keluar"
-                    style="background: #E60000; border: none; color: #ffffff; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.9rem; padding: 6px 16px; border-radius: 6px;">Keluar</a>
+                <!-- admin tampilan desktop : dropdown -->
+                <div class="user-dropdown-wrapper" id="adminDropdownWrapper">
+                    <button type="button" class="btn-user-nama" id="btnAdminNama">
+                        <svg class="icon-user" viewBox="0 0 24 24"
+                            style="width: 20px; height: 20px; vertical-align: middle; fill: currentColor; margin-right: 8px;">
+                            <path
+                                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                        </svg>
+                        <?= $nama_admin; ?>
+                        <svg class="chevron-user" viewBox="0 0 24 24">
+                            <path d="M7 10l5 5 5-5z" />
+                        </svg>
+                    </button>
+                    <div class="user-dropdown-menu" id="adminDropdownMenu">
+                        <div class="user-dropdown-header">
+                            <svg class="icon-user-header" viewBox="0 0 24 24"
+                                style="width: 18px; height: 18px; vertical-align: middle; fill: currentColor; margin-right: 8px;">
+                                <path
+                                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                            </svg>
+                            <?= $nama_admin; ?>
+                        </div>
+                        <a href="/reservasi_hotel/layanan_hotel/kelola_hotel.php">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-5h2v5zm4 0h-2V9h2v8zm4 0h-2v-3h2v3z" />
+                            </svg>
+                            Admin Panel
+                        </a>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="/reservasi_hotel/layanan_autentikasi/keluar.php" class="item-keluar">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+                            </svg>
+                            Keluar
+                        </a>
+                    </div>
+                </div>
                 <?php endif; ?>
 
                 <?php else: ?>
@@ -329,6 +362,22 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('click', (e) => {
             if (!userDropdownWrapper.contains(e.target)) {
                 userDropdownWrapper.classList.remove('open');
+            }
+        });
+    }
+
+    /* desktop : admin dropdown */
+    const adminDropdownWrapper = document.getElementById('adminDropdownWrapper');
+    const btnAdminNama = document.getElementById('btnAdminNama');
+
+    if (adminDropdownWrapper && btnAdminNama) {
+        btnAdminNama.addEventListener('click', (e) => {
+            e.stopPropagation();
+            adminDropdownWrapper.classList.toggle('open');
+        });
+        document.addEventListener('click', (e) => {
+            if (!adminDropdownWrapper.contains(e.target)) {
+                adminDropdownWrapper.classList.remove('open');
             }
         });
     }

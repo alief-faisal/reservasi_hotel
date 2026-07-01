@@ -20,8 +20,12 @@ $mode_terdekat = ($user_lat !== null && $user_lng !== null);
 
 /* Kalau ada filter aktif (pencarian / lokasi / mode terdekat),
    tampilan cukup pakai card list horizontal saja (baris 3),
-   tanpa grid 4 kolom & tanpa section diskon biru di atasnya. */
-$ada_filter_aktif = ($keyword !== '' || $lokasi_filter !== '' || $mode_terdekat);
+   tanpa grid 4 kolom & tanpa section diskon biru di atasnya.
+   Parameter ?lokasi= yang sengaja dikirim kosong (misalnya user klik
+   "Semua Lokasi" di dropdown) tetap dihitung sebagai filter aktif,
+   bukan disamakan dengan kondisi halaman awal tanpa filter sama sekali. */
+$lokasi_param_dikirim = isset($_GET['lokasi']);
+$ada_filter_aktif = ($keyword !== '' || $lokasi_filter !== '' || $mode_terdekat || $lokasi_param_dikirim);
 
 /* ============================================================
    Ambil Semua Data Beserta Info Diskon Per Tipe Kamar
@@ -66,10 +70,16 @@ if ($hasil_raw && $hasil_raw->num_rows > 0) {
         }
 
         $diskon = intval($row['diskon_persen'] ?? 0);
-        /* 
-         * Hotel diskon >= 50% hanya masuk seksi biru jika TIDAK ada filter aktif.
-         * Jika ada keyword/lokasi filter, semua hotel tampil di baris biasa agar
-         * card list horizontal juga muncul.
+        /*
+         * Hotel diskon >= 50% masuk ke seksi biru (baris kedua) HANYA saat
+         * tidak ada filter aktif (halaman awal), supaya tidak nyasar ke
+         * baris pertama / baris ketiga.
+         *
+         * Tapi saat sedang search/filter/lokasi terdekat, hotel diskon >=50%
+         * tetap harus muncul di hasil pencarian — hanya saja tampilannya
+         * disamakan dengan card list horizontal biasa (baris ketiga),
+         * bukan pakai layout slider biru khusus. Makanya di sini mereka
+         * dimasukkan ke $hotel_biasa supaya ikut render di baris ketiga.
          */
         if ($diskon >= 50 && !$ada_filter_aktif) {
             $hotel_diskon[] = $row;
@@ -105,6 +115,10 @@ $jumlah_hotel_diskon = count($hotel_diskon);
    Supaya baris pertama benar-benar acak lintas wilayah dan
    berubah setiap refresh, kita ambil 4 hotel dengan query
    ORDER BY RAND() murni (tanpa ikut urutan lokasi).
+
+   Hotel dengan diskon >= 50% dikecualikan lewat HAVING supaya
+   tidak pernah muncul di baris pertama ini (hanya boleh tampil
+   di baris kedua / seksi diskon biru).
    ============================================================ */
 $hotel_grid_atas = [];
 if (!$ada_filter_aktif) {
@@ -118,6 +132,7 @@ if (!$ada_filter_aktif) {
           FROM hotel h
           LEFT JOIN kamar k ON h.id_hotel = k.id_hotel
           GROUP BY h.id_hotel
+          HAVING diskon_persen IS NULL OR diskon_persen < 50
           ORDER BY RAND()
           LIMIT 4";
     $hasil_random4 = $koneksi->query($query_random4);
@@ -433,12 +448,14 @@ function getBadgeDiskon(array $row): array|false {
                     endfor;
                     ?>
                 </div>
+                <?php endif; // tutup baris pertama (!$ada_filter_aktif) ?>
 
-                <!-- card baris kedua -->
+                <!-- card baris kedua: tetap tampil walau ada filter aktif (search/lokasi/terdekat),
+                     supaya hotel diskon >=50% yang cocok dengan pencarian tetap kelihatan -->
                 <?php if ($jumlah_hotel_diskon > 0): ?>
                 <div class="container-diskon-tengah">
                     <section class="section-diskon-besar">
-                        <h3 class="section-title-diskon">Diskon nginep lebih dari 50%!</h3>
+                        <h3 class="section-title-diskon">Hotel dengan diskon 50% ke atas!</h3>
 
                         <div class="slider-diskon-wrapper">
                             <button class="chevron-btn chevron-left" aria-label="Slide Left">
@@ -546,7 +563,6 @@ function getBadgeDiskon(array $row): array|false {
                     </section>
                 </div>
                 <?php endif; ?>
-                <?php endif; // tutup if (!$ada_filter_aktif) ?>
 
                 <!-- card baris ketiga -->
                 <?php
@@ -562,8 +578,12 @@ function getBadgeDiskon(array $row): array|false {
                         $lokasi_hotel = htmlspecialchars($row['lokasi']);
                         $is_terlaris  = in_array(intval($id_hotel), $hotel_terlaris_ids);
                         $jarak_km     = $row['_jarak_km'];
-                        /* logika searchbar menampilkan keyword ketikan, dan filter lokasi terdaftar */    
-                        if (!$mode_terdekat && $keyword === '' && $lokasi_hotel !== $current_location) {
+                        /* logika judul grup lokasi: tetap tampil walau lagi search keyword,
+                           supaya hasil pencarian "serang" misalnya tetap dikelompokkan jadi
+                           "Hotel Pilihan di Kota Serang" dan "Hotel Pilihan di Kabupaten Serang".
+                           Hanya disembunyikan saat mode lokasi terdekat (GPS), karena urutannya
+                           berdasarkan jarak, bukan per-lokasi. */
+                        if (!$mode_terdekat && $lokasi_hotel !== $current_location) {
     $current_location = $lokasi_hotel;
     echo '<h3 class="sub-section-location-title">Hotel Pilihan di ' . $current_location . '</h3>';
 }
